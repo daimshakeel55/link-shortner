@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Linkly — Premium URL Shortener
+
+A production-ready SaaS URL shortener built with Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion, and Supabase.
+
+## Features
+
+- **Landing Page** — Premium marketing site with hero, features, pricing, FAQ, and CTA
+- **Authentication** — Email, Google, and GitHub login via Supabase Auth
+- **Dashboard** — Overview with stats, recent links, and quick actions
+- **Link Management** — Create, edit, delete, copy, QR codes, custom slugs, expiration, password protection
+- **Analytics** — Clicks, visitors, countries, devices, browsers, referrers with interactive charts
+- **Settings** — Profile, password, billing, account deletion
+- **Security** — Row Level Security, rate limiting, input validation, secure redirects
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- Framer Motion
+- Supabase (Auth + PostgreSQL)
+- React Hook Form + Zod
+- TanStack React Query
+- Recharts
+- Lucide Icons
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone and install
+
+```bash
+cd link-shortner
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run the migration in `supabase/migrations/001_initial_schema.sql` via the SQL Editor
+3. Enable Google and GitHub auth providers in Authentication → Providers
+4. Add redirect URL: `http://localhost:3000/auth/callback`
+
+### 3. Configure environment
+
+```bash
+cp .env.local.example .env.local
+```
+
+Fill in your Supabase credentials:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=Linkly
+```
+
+### 4. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, register, forgot password
+│   ├── [slug]/          # Short link redirect handler
+│   ├── api/             # REST API routes
+│   ├── auth/callback/   # OAuth callback
+│   ├── dashboard/       # Protected dashboard pages
+│   ├── layout.tsx       # Root layout
+│   └── page.tsx         # Landing page
+├── components/
+│   ├── analytics/       # Analytics charts
+│   ├── auth/            # Auth forms
+│   ├── dashboard/       # Sidebar, header
+│   ├── landing/         # Landing page sections
+│   ├── links/           # Link management
+│   ├── settings/        # Settings forms
+│   ├── shared/          # Reusable components
+│   └── ui/              # shadcn/ui components
+├── hooks/               # React Query hooks
+├── lib/                 # Utilities, validations, Supabase
+└── types/               # TypeScript types
+supabase/
+└── migrations/          # Database schema + RLS
+```
 
-## Learn More
+## Database
 
-To learn more about Next.js, take a look at the following resources:
+The schema includes:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `profiles` — User profiles (auto-created on signup)
+- `links` — Short links with slugs, passwords, expiration
+- `click_events` — Analytics tracking
+- `api_keys` — API key management
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All tables have Row Level Security enabled.
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deploy to Vercel:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push to GitHub
+2. Import in Vercel
+3. Add environment variables
+4. Update Supabase redirect URLs to your production domain
+
+## License
+
+MIT
