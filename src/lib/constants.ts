@@ -3,7 +3,13 @@ export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "Linkly";
 function resolveAppUrl() {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
   if (configured) return configured;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
+  const productionDomain = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (productionDomain) {
+    const host = productionDomain.replace(/^https?:\/\//, "");
+    return `https://${host}`;
+  }
+
   return "http://localhost:3000";
 }
 

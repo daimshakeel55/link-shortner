@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { registerSchema } from "@/lib/validations/auth";
+import { getAuthCallbackUrl } from "@/lib/app-url";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -45,15 +46,22 @@ export async function POST(request: Request) {
     }
   }
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    new URL(request.url).origin;
+  const authCallbackUrl = getAuthCallbackUrl();
+  if (!authCallbackUrl) {
+    return NextResponse.json(
+      {
+        error:
+          "NEXT_PUBLIC_APP_URL is not configured on the server. Set it to https://link-shortner-hzgm.vercel.app",
+      },
+      { status: 503 }
+    );
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
-      emailRedirectTo: `${appUrl}/auth/callback`,
+      emailRedirectTo: authCallbackUrl,
       data: {
         username: username.trim(),
         full_name: fullName.trim(),
