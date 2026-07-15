@@ -23,16 +23,18 @@ export function AnalyticsContent() {
   return (
     <>
       <DashboardHeader title="Analytics" description="Overview of your link performance">
-        <Tabs value={period} onValueChange={(v) => setPeriod(v as AnalyticsPeriod)}>
-          <TabsList>
-            <TabsTrigger value="daily">Daily</TabsTrigger>
-            <TabsTrigger value="weekly">Weekly</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="w-full overflow-x-auto md:w-auto">
+          <Tabs value={period} onValueChange={(v) => setPeriod(v as AnalyticsPeriod)}>
+            <TabsList className="w-full min-w-max sm:w-auto">
+              <TabsTrigger value="daily">Daily</TabsTrigger>
+              <TabsTrigger value="weekly">Weekly</TabsTrigger>
+              <TabsTrigger value="monthly">Monthly</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </DashboardHeader>
 
-      <div className="mx-auto max-w-5xl space-y-8 p-8">
+      <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-6 md:p-8">
         {isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-24 rounded-xl" />
@@ -41,7 +43,7 @@ export function AnalyticsContent() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Stat label="Total clicks" value={data?.totalClicks ?? 0} />
               <Stat label="Unique visitors" value={data?.uniqueVisitors ?? 0} />
             </div>

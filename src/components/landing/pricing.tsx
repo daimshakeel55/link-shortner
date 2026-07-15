@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function Pricing() {
   return (
     <section id="pricing" className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <FadeIn>
           <div className="text-center">
             <p className="text-sm font-medium text-primary">Pricing</p>

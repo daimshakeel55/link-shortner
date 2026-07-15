@@ -7,7 +7,7 @@ import { FadeIn } from "@/components/shared/motion";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
+    <section className="relative overflow-hidden pt-24 pb-16 sm:pt-32 sm:pb-20 md:pt-40 md:pb-32">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-1/4 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full orb-primary blur-3xl" />
         <div className="absolute top-1/2 right-0 size-[400px] translate-x-1/2 rounded-full orb-light blur-3xl" />
@@ -22,7 +22,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 text-center">
+      <div className="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
         <FadeIn>
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}

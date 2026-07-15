@@ -53,7 +53,7 @@ function FAQItem({
 export function FAQ() {
   return (
     <section id="faq" className="py-24 md:py-32">
-      <div className="mx-auto max-w-3xl px-6">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <FadeIn>
           <div className="text-center">
             <p className="text-sm font-medium text-primary">FAQ</p>

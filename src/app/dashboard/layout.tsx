@@ -63,7 +63,9 @@ ${diagnostics.map((d) => `${d.ok ? "OK" : "FAIL"} ${d.step} ${d.detail ?? ""}`).
       <div className="flex min-h-screen">
         <DashboardSidebar />
         <GlowBackground>
-          <main className="min-h-screen flex-1 overflow-auto">{children}</main>
+          <main className="min-h-screen flex-1 overflow-x-hidden overflow-y-auto pt-14 md:pt-0">
+            {children}
+          </main>
         </GlowBackground>
       </div>
     );

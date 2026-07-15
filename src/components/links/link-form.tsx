@@ -111,11 +111,11 @@ export function LinkForm({ link, mode = "create" }: LinkFormProps) {
           </div>
         )}
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
           <Button
             type="submit"
             disabled={loading}
-            className="glow-btn btn-brand h-11 px-6"
+            className="glow-btn btn-brand h-11 w-full px-6 sm:w-auto"
           >
             {loading ? (
               <Loader2 className="size-4 animate-spin" />
@@ -126,7 +126,7 @@ export function LinkForm({ link, mode = "create" }: LinkFormProps) {
               </>
             )}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+          <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => router.back()}>
             Cancel
           </Button>
         </div>

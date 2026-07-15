@@ -6,7 +6,7 @@ import { StaggerContainer, StaggerItem } from "@/components/shared/motion";
 export function Statistics() {
   return (
     <section className="border-y border-border bg-card/30 py-16 md:py-20">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {STATS.map((stat) => (
             <StaggerItem key={stat.label}>

@@ -84,13 +84,13 @@ export function LinksPageContent() {
         title="Links"
         description="Manage and track all your short links"
       >
-        <LinkButton href="/dashboard/links/new">
+        <LinkButton href="/dashboard/links/new" className="w-full sm:w-auto">
           <Plus className="mr-2 size-4" />
           Create Link
         </LinkButton>
       </DashboardHeader>
 
-      <div className="space-y-6 p-6 md:p-8">
+      <div className="space-y-6 p-4 sm:p-6 md:p-8">
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -147,18 +147,18 @@ export function LinksPageContent() {
               {data.data.map((link) => (
                 <div
                   key={link.id}
-                  className="glow-card p-4"
+                  className="glow-card flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:gap-4"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate font-medium">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="max-w-full truncate font-medium">
                         {link.title || link.shortUrl}
                       </p>
                       <Badge variant={link.is_active ? "default" : "secondary"}>
                         {link.is_active ? "Active" : "Disabled"}
                       </Badge>
                     </div>
-                    <div className="mt-1 flex items-center gap-2">
+                    <div className="mt-1 flex min-w-0 items-center gap-2">
                       <p className="truncate text-sm text-primary">
                         {link.shortUrl}
                       </p>
@@ -172,12 +172,13 @@ export function LinksPageContent() {
                     </p>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-xl font-semibold">{link.click_count}</p>
-                    <p className="text-xs text-muted-foreground">clicks</p>
-                  </div>
+                  <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-start">
+                    <div className="text-left sm:text-right">
+                      <p className="text-xl font-semibold">{link.click_count}</p>
+                      <p className="text-xs text-muted-foreground">clicks</p>
+                    </div>
 
-                  <DropdownMenu>
+                    <DropdownMenu>
                     <DropdownMenuTrigger
                       render={
                         <Button variant="ghost" size="icon">
@@ -211,7 +212,8 @@ export function LinksPageContent() {
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
-                  </DropdownMenu>
+                    </DropdownMenu>
+                  </div>
                 </div>
               ))}
             </div>

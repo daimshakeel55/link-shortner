@@ -24,7 +24,7 @@ const iconMap: Record<string, LucideIcon> = {
 export function Features() {
   return (
     <section id="features" className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <FadeIn>
           <div className="text-center">
             <p className="text-sm font-medium text-primary">Features</p>

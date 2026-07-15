@@ -26,6 +26,13 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   return (
     <motion.header
       initial={{ y: -12, opacity: 0 }}
@@ -36,7 +43,7 @@ export function Navbar() {
         scrolled ? "glass border-b border-border" : "bg-transparent"
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Logo />
 
         <div className="hidden items-center gap-8 md:flex">

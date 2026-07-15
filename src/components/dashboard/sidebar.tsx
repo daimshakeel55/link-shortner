@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,6 +32,14 @@ const navItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   async function handleSignOut() {
     try {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
@@ -156,8 +164,8 @@ export function DashboardHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 border-b border-border px-6 py-6 md:flex-row md:items-center md:justify-between md:px-8">
-      <div>
+    <div className="flex flex-col gap-4 border-b border-border px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between md:px-8 md:py-6">
+      <div className="min-w-0">
         {backHref && (
           <Link
             href={backHref}
@@ -167,12 +175,16 @@ export function DashboardHeader({
             Back
           </Link>
         )}
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h1>
         {description && (
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {children && <div className="flex items-center gap-3">{children}</div>}
+      {children && (
+        <div className="flex w-full shrink-0 flex-wrap items-center gap-3 md:w-auto">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

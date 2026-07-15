@@ -7,7 +7,7 @@ import { FadeIn } from "@/components/shared/motion";
 export function CTA() {
   return (
     <section className="py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <FadeIn>
           <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-8 py-16 text-center md:px-16 md:py-20">
             <div className="pointer-events-none absolute inset-0">

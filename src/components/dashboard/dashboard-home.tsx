@@ -33,9 +33,9 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 p-8">
+    <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-6 md:p-8">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           {userName ? (
             <>
               Hey,{" "}
@@ -54,7 +54,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
 
       <ShortenWidget />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
           <p className="text-sm text-muted-foreground">Links</p>
           <p className="mt-2 text-3xl font-semibold">{links.length}</p>
@@ -93,11 +93,11 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
             {links.map((link) => (
               <div
                 key={link.id}
-                className="flex items-center gap-4 px-5 py-4 first:rounded-t-xl last:rounded-b-xl"
+                className="flex flex-col gap-3 px-4 py-4 first:rounded-t-xl last:rounded-b-xl sm:flex-row sm:items-center sm:gap-4 sm:px-5"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-base font-medium">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="max-w-full truncate text-sm font-medium sm:text-base">
                       {link.shortUrl ?? getShortUrl(link.slug)}
                     </p>
                     <CopyButton
@@ -111,11 +111,12 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                     {link.original_url}
                   </p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-base font-semibold">{link.click_count}</p>
-                  <p className="text-sm text-muted-foreground">views</p>
-                </div>
-                <Button
+                <div className="flex items-center justify-between gap-3 sm:shrink-0 sm:justify-end">
+                  <div className="text-left sm:text-right">
+                    <p className="text-base font-semibold">{link.click_count}</p>
+                    <p className="text-sm text-muted-foreground">views</p>
+                  </div>
+                  <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDelete(link.id)}
@@ -124,6 +125,7 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
                 >
                   <Trash2 className="size-4" />
                 </Button>
+                </div>
               </div>
             ))}
           </div>
