@@ -26,32 +26,10 @@ export function sanitizeSlug(input: string): string {
     .slice(0, 64);
 }
 
-function isVercelDeploymentHost(hostname: string) {
-  return /-daim1\.vercel\.app$/i.test(hostname);
-}
-
-export function resolveShortUrl(slug: string, request?: Request) {
-  const configured = getServerAppUrl();
-  if (configured) {
-    return `${configured}/${slug}`;
-  }
-
-  if (request) {
-    const origin = new URL(request.url).origin;
-    const hostname = new URL(origin).hostname;
-    if (!isVercelDeploymentHost(hostname)) {
-      return `${origin.replace(/\/$/, "")}/${slug}`;
-    }
-  }
-
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    if (!isVercelDeploymentHost(hostname)) {
-      return `${window.location.origin.replace(/\/$/, "")}/${slug}`;
-    }
-  }
-
-  return `http://localhost:3000/${slug}`;
+/** Always uses the public production domain, never a private deploy URL. */
+export function resolveShortUrl(slug: string, _request?: Request) {
+  const base = getServerAppUrl() ?? "http://localhost:3000";
+  return `${base.replace(/\/$/, "")}/${slug}`;
 }
 
 export function getShortUrl(slug: string) {
