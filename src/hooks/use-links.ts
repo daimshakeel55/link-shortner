@@ -1,8 +1,6 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { LinkWithShortUrl, PaginatedResult } from "@/types";
 
 interface LinksQueryParams {
@@ -11,30 +9,11 @@ interface LinksQueryParams {
   status?: string;
 }
 
-async function refreshClientSession() {
-  if (!isSupabaseConfigured()) return false;
-
-  try {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.refreshSession();
-    return !error && Boolean(data.session);
-  } catch {
-    return false;
-  }
-}
-
-async function apiFetch(url: string, options?: RequestInit, retried = false) {
+async function apiFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, {
     ...options,
     credentials: "same-origin",
   });
-
-  if (res.status === 401 && !retried) {
-    const refreshed = await refreshClientSession();
-    if (refreshed) {
-      return apiFetch(url, options, true);
-    }
-  }
 
   if (res.status === 401) {
     window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -103,6 +82,7 @@ export function useCreateLink() {
     mutationFn: createLink,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 }
@@ -114,6 +94,7 @@ export function useUpdateLink() {
       updateLink(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 }
@@ -124,6 +105,7 @@ export function useDeleteLink() {
     mutationFn: deleteLink,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 }

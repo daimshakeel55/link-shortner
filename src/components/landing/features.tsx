@@ -43,7 +43,7 @@ export function Features() {
             const Icon = iconMap[feature.icon];
             return (
               <StaggerItem key={feature.title}>
-                <div className="group h-full rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
+                <div className="group h-full rounded-2xl border border-border bg-card p-6 smooth-hover hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20 transition-colors group-hover:bg-primary/15">
                     <Icon className="size-5 text-primary" />
                   </div>

@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -6,38 +6,51 @@ import { RESERVED_SLUGS } from "@/lib/constants";
 import { extractRequestMetadata, parseUserAgent } from "@/lib/analytics";
 import { hashIp } from "@/lib/slug";
 import { PasswordGate } from "@/components/links/password-gate";
+import { LinkPreview } from "@/components/links/link-preview";
 import {
   getDemoLinkBySlug,
   incrementDemoClick,
 } from "@/lib/demo-store";
+
+export const dynamic = "force-dynamic";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ verified?: string }>;
 }
 
+function normalizeRedirectUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 async function trackSupabaseClick(linkId: string, headersList: Headers) {
-  const metadata = extractRequestMetadata(headersList);
-  const ua = metadata.userAgent
-    ? parseUserAgent(metadata.userAgent)
-    : { browser: "Unknown", os: "Unknown", device: "desktop" };
+  try {
+    const metadata = extractRequestMetadata(headersList);
+    const ua = metadata.userAgent
+      ? parseUserAgent(metadata.userAgent)
+      : { browser: "Unknown", os: "Unknown", device: "desktop" };
 
-  const visitorId = metadata.ip ? hashIp(metadata.ip) : crypto.randomUUID();
-  const supabase = await createClient();
+    const visitorId = metadata.ip ? hashIp(metadata.ip) : crypto.randomUUID();
+    const supabase = await createClient();
 
-  await supabase.from("click_events").insert({
-    link_id: linkId,
-    visitor_id: visitorId,
-    ip_hash: metadata.ip ? hashIp(metadata.ip) : null,
-    country: metadata.country ?? null,
-    city: metadata.city ?? null,
-    device: ua.device,
-    browser: ua.browser,
-    os: ua.os,
-    referrer: metadata.referer,
-  });
+    await supabase.from("click_events").insert({
+      link_id: linkId,
+      visitor_id: visitorId,
+      ip_hash: metadata.ip ? hashIp(metadata.ip) : null,
+      country: metadata.country ?? null,
+      city: metadata.city ?? null,
+      device: ua.device,
+      browser: ua.browser,
+      os: ua.os,
+      referrer: metadata.referer,
+    });
 
-  await supabase.rpc("increment_click_count", { link_uuid: linkId });
+    await supabase.rpc("increment_click_count", { link_uuid: linkId });
+  } catch {
+    // Never block redirect if analytics fails
+  }
 }
 
 export default async function SlugPage({
@@ -61,7 +74,12 @@ export default async function SlugPage({
       return <PasswordGate slug={slug} />;
     }
     incrementDemoClick(slug);
-    redirect(demoLink.original_url);
+    return (
+      <LinkPreview
+        destinationUrl={normalizeRedirectUrl(demoLink.original_url)}
+        slug={slug}
+      />
+    );
   }
 
   if (!isSupabaseConfigured()) {
@@ -91,5 +109,10 @@ export default async function SlugPage({
   const headersList = await headers();
   await trackSupabaseClick(link.id, headersList);
 
-  redirect(link.original_url);
+  return (
+    <LinkPreview
+      destinationUrl={normalizeRedirectUrl(link.original_url)}
+      slug={slug}
+    />
+  );
 }

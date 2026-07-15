@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { createClient } from "@/lib/supabase/client";
 import {
   profileSchema,
   passwordChangeSchema,
@@ -36,6 +35,8 @@ export function SettingsContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
@@ -50,28 +51,28 @@ export function SettingsContent() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
+        const res = await fetch("/api/account/profile");
+        if (res.status === 401) {
           router.push("/login");
           return;
         }
 
-        setEmail(user.email ?? "");
-        setAvatarUrl(user.user_metadata?.avatar_url ?? null);
+        if (!res.ok) {
+          toast.error("Could not load profile");
+          return;
+        }
 
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
+        const profile = (await res.json()) as {
+          fullName: string;
+          email: string;
+          avatarUrl: string | null;
+        };
 
+        setEmail(profile.email);
+        setAvatarUrl(profile.avatarUrl);
         profileForm.reset({
-          fullName: profile?.full_name ?? user.user_metadata?.full_name ?? "",
-          email: user.email ?? "",
+          fullName: profile.fullName,
+          email: profile.email,
         });
       } catch {
         toast.error("Could not load profile");
@@ -84,20 +85,17 @@ export function SettingsContent() {
 
   async function onProfileSubmit(data: ProfileInput) {
     setSaving(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user) return;
+    const res = await fetch("/api/account/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ full_name: data.fullName })
-      .eq("id", user.id);
+    const result = (await res.json()) as { error?: string };
 
-    if (error) {
-      toast.error(error.message);
+    if (!res.ok) {
+      toast.error(result.error ?? "Failed to update profile");
     } else {
       toast.success("Profile updated");
     }
@@ -105,34 +103,50 @@ export function SettingsContent() {
   }
 
   async function onPasswordSubmit(data: PasswordChangeInput) {
-    setSaving(true);
-    const supabase = createClient();
+    setPasswordSaving(true);
 
-    const { error } = await supabase.auth.updateUser({
-      password: data.newPassword,
-    });
+    try {
+      const res = await fetch("/api/account/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
+      const result = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        toast.error(result.error ?? "Failed to update password");
+        return;
+      }
+
       toast.success("Password updated");
       passwordForm.reset();
+    } catch {
+      toast.error("Failed to update password");
+    } finally {
+      setPasswordSaving(false);
     }
-    setSaving(false);
   }
 
   async function handleDeleteAccount() {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    setDeleting(true);
 
-    if (!user) return;
+    try {
+      const res = await fetch("/api/account/delete", { method: "DELETE" });
+      const result = (await res.json()) as { error?: string };
 
-    await supabase.from("profiles").delete().eq("id", user.id);
-    await supabase.auth.signOut();
-    toast.success("Account deleted");
-    router.push("/");
+      if (!res.ok) {
+        toast.error(result.error ?? "Failed to delete account");
+        setDeleting(false);
+        return;
+      }
+
+      toast.success("Account deleted");
+      window.location.href = "/";
+    } catch {
+      toast.error("Failed to delete account");
+      setDeleting(false);
+    }
   }
 
   if (loading) {
@@ -207,10 +221,25 @@ export function SettingsContent() {
               className="space-y-4"
             >
               <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  autoComplete="current-password"
+                  {...passwordForm.register("currentPassword")}
+                />
+                {passwordForm.formState.errors.currentPassword && (
+                  <p className="text-xs text-destructive">
+                    {passwordForm.formState.errors.currentPassword.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="newPassword">New password</Label>
                 <Input
                   id="newPassword"
                   type="password"
+                  autoComplete="new-password"
                   {...passwordForm.register("newPassword")}
                 />
                 {passwordForm.formState.errors.newPassword && (
@@ -224,10 +253,19 @@ export function SettingsContent() {
                 <Input
                   id="confirmPassword"
                   type="password"
+                  autoComplete="new-password"
                   {...passwordForm.register("confirmPassword")}
                 />
+                {passwordForm.formState.errors.confirmPassword && (
+                  <p className="text-xs text-destructive">
+                    {passwordForm.formState.errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={passwordSaving}>
+                {passwordSaving && (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                )}
                 Update password
               </Button>
             </form>
@@ -280,9 +318,16 @@ export function SettingsContent() {
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleDeleteAccount}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void handleDeleteAccount();
+                    }}
+                    disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
+                    {deleting && (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    )}
                     Delete account
                   </AlertDialogAction>
                 </AlertDialogFooter>

@@ -1,5 +1,13 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "Linkly";
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+function resolveAppUrl() {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  if (configured) return configured;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+export const APP_URL = resolveAppUrl();
 
 export const RESERVED_SLUGS = [
   "api",
@@ -12,6 +20,7 @@ export const RESERVED_SLUGS = [
   "links",
   "forgot-password",
   "reset-password",
+  "verify-email",
   "pricing",
   "about",
   "blog",

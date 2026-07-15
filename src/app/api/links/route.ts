@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
+import { getDatabaseClient } from "@/lib/supabase/database";
 import { createLinkSchema } from "@/lib/validations/link";
 import { generateSlug, getShortUrl, hashPassword } from "@/lib/slug";
 import { rateLimit } from "@/lib/rate-limit";
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
 
   const { data: existing } = await supabase
     .from("links")

@@ -1,5 +1,5 @@
 import { customAlphabet } from "nanoid";
-import { RESERVED_SLUGS, SLUG_MIN_LENGTH } from "@/lib/constants";
+import { APP_URL, RESERVED_SLUGS, SLUG_MIN_LENGTH } from "@/lib/constants";
 
 const nanoid = customAlphabet(
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -26,8 +26,7 @@ export function sanitizeSlug(input: string): string {
 }
 
 export function getShortUrl(slug: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  return `${baseUrl}/${slug}`;
+  return `${APP_URL}/${slug}`;
 }
 
 export async function hashPassword(password: string): Promise<string> {

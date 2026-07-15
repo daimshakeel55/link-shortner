@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/shared/copy-button";
+import { smoothSpring, smoothTransition } from "@/components/shared/motion";
 import { useCreateLink } from "@/hooks/use-links";
 import type { LinkWithShortUrl } from "@/types";
 
@@ -46,22 +47,22 @@ export function ShortenWidget() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={smoothTransition}
       className="glow-card p-6 md:p-8"
     >
-      <div className="pointer-events-none absolute top-0 right-0 size-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-purple-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-0 size-48 -translate-x-1/4 translate-y-1/4 rounded-full bg-cyan-500/15 blur-3xl" />
+      <div className="pointer-events-none absolute top-0 right-0 size-64 translate-x-1/3 -translate-y-1/3 rounded-full orb-primary blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-0 size-48 -translate-x-1/4 translate-y-1/4 rounded-full orb-light blur-3xl" />
 
       <div className="relative">
         <div className="mb-6 flex items-center gap-3">
           <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/30 to-cyan-500/20 ring-1 ring-purple-500/30"
+            animate={{ rotate: [0, 4, -4, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+            className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/30 to-brand-light/20 ring-1 ring-primary/30"
           >
-            <Sparkles className="size-5 text-purple-300" />
+            <Sparkles className="size-5 text-primary" />
           </motion.div>
           <div>
             <h2 className="text-lg font-semibold">Shorten a link</h2>
@@ -74,12 +75,12 @@ export function ShortenWidget() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <Link2 className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-purple-400" />
+              <Link2 className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-primary" />
               <Input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.com/my-long-url"
-                className="h-12 border-primary/20 bg-background/50 pl-10 transition-all focus:border-primary/50 focus:shadow-[0_0_20px_rgba(168,85,247,0.15)]"
+                className="h-12 border-primary/20 bg-background/50 pl-10 transition-all focus:border-primary/50 focus:shadow-[0_0_20px_rgba(59,130,246,0.2)]"
               />
             </div>
             <Input
@@ -91,7 +92,7 @@ export function ShortenWidget() {
             <Button
               type="submit"
               size="lg"
-              className="glow-btn h-12 bg-gradient-to-r from-purple-600 to-violet-500 px-8 hover:from-purple-500 hover:to-violet-400"
+              className="glow-btn btn-brand h-12 px-8"
               disabled={createLink.isPending}
             >
               {createLink.isPending ? (
@@ -109,14 +110,14 @@ export function ShortenWidget() {
         <AnimatePresence mode="wait">
           {createdLink && (
             <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="mt-6 rounded-xl border border-cyan-500/30 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 p-4"
-              style={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.15)" }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={smoothSpring}
+              className="mt-6 rounded-xl border border-brand-light/30 bg-gradient-to-r from-primary/10 to-brand-light/10 p-4"
+              style={{ boxShadow: "0 0 30px rgba(59, 130, 246, 0.15)" }}
             >
-              <div className="flex items-center gap-2 text-sm text-cyan-300">
+              <div className="flex items-center gap-2 text-sm text-brand-light">
                 <Check className="size-4" />
                 Your link is ready
               </div>

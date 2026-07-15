@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
+import { getDatabaseClient } from "@/lib/supabase/database";
 import { updateLinkSchema } from "@/lib/validations/link";
 import { getShortUrl, hashPassword } from "@/lib/slug";
 import type { Link, LinkUpdate } from "@/types/database";
@@ -28,7 +28,7 @@ export async function GET(
     return NextResponse.json({ ...link, shortUrl: getShortUrl(link.slug) });
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
   const { data, error } = await supabase
     .from("links")
     .select("*")
@@ -96,7 +96,7 @@ export async function PATCH(
     return NextResponse.json({ ...data, shortUrl: getShortUrl(data.slug) });
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
   const updates: LinkUpdate = {};
 
   if (parsed.data.originalUrl) updates.original_url = parsed.data.originalUrl;
@@ -162,7 +162,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
   const { error } = await supabase
     .from("links")
     .delete()

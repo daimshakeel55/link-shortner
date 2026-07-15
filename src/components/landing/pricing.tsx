@@ -28,7 +28,7 @@ export function Pricing() {
             <StaggerItem key={plan.name}>
               <div
                 className={cn(
-                  "relative flex h-full flex-col rounded-2xl border p-8 transition-all duration-300 hover:-translate-y-1",
+                  "smooth-hover relative flex h-full flex-col rounded-2xl border p-8 hover:-translate-y-1",
                   plan.highlighted
                     ? "border-primary/50 bg-card shadow-lg shadow-primary/5"
                     : "border-border bg-card hover:border-primary/20"

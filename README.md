@@ -5,7 +5,7 @@ A production-ready SaaS URL shortener built with Next.js 15, TypeScript, Tailwin
 ## Features
 
 - **Landing Page** — Premium marketing site with hero, features, pricing, FAQ, and CTA
-- **Authentication** — Email, Google, and GitHub login via Supabase Auth
+- **Authentication** — Email, username, and password via Supabase Auth
 - **Dashboard** — Overview with stats, recent links, and quick actions
 - **Link Management** — Create, edit, delete, copy, QR codes, custom slugs, expiration, password protection
 - **Analytics** — Clicks, visitors, countries, devices, browsers, referrers with interactive charts
@@ -19,7 +19,7 @@ A production-ready SaaS URL shortener built with Next.js 15, TypeScript, Tailwin
 - Tailwind CSS v4
 - shadcn/ui
 - Framer Motion
-- Supabase (Auth + PostgreSQL)
+- Supabase (PostgreSQL database + authentication)
 - React Hook Form + Zod
 - TanStack React Query
 - Recharts
@@ -37,9 +37,11 @@ npm install
 ### 2. Set up Supabase
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run the migration in `supabase/migrations/001_initial_schema.sql` via the SQL Editor
-3. Enable Google and GitHub auth providers in Authentication → Providers
-4. Add redirect URL: `http://localhost:3000/auth/callback`
+2. Run migrations in order via the SQL Editor:
+   - `supabase/migrations/001_initial_schema.sql`
+   - `supabase/migrations/003_supabase_auth.sql` (skip `002_clerk_profiles.sql` on fresh installs)
+3. In Authentication → Providers, enable **Email** (email + password)
+4. Optional: disable email confirmation in Authentication → Providers → Email for faster local dev
 
 ### 3. Configure environment
 
@@ -104,14 +106,43 @@ The schema includes:
 
 All tables have Row Level Security enabled.
 
-## Deployment
+## Deployment (Vercel)
 
-Deploy to Vercel:
+### 1. Push to GitHub
 
-1. Push to GitHub
-2. Import in Vercel
-3. Add environment variables
-4. Update Supabase redirect URLs to your production domain
+Commit your code and push to a GitHub repository.
+
+### 2. Import in Vercel
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repo
+3. Set **Root Directory** to `link-shortner` if the repo root is the parent folder, otherwise leave as `.`
+4. Framework preset: **Next.js** (auto-detected)
+
+### 3. Environment variables
+
+Add these in Vercel → Project → Settings → Environment Variables:
+
+| Variable | Value |
+|----------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server only) |
+| `NEXT_PUBLIC_APP_URL` | `https://your-domain.vercel.app` (or custom domain) |
+| `NEXT_PUBLIC_APP_NAME` | `Linkly` |
+
+### 4. Supabase production settings
+
+In Supabase → Authentication → URL Configuration:
+
+- **Site URL:** `https://your-domain.vercel.app`
+- **Redirect URLs:** add `https://your-domain.vercel.app/**`
+
+Run `supabase/migrations/003_supabase_auth.sql` in the SQL Editor if you have not already.
+
+### 5. Deploy
+
+Click **Deploy**. Vercel builds with `npm run build` and hosts the app automatically on every push to your main branch.
 
 ## License
 

@@ -1,13 +1,21 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().min(1, "Enter your email or username"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export const registerSchema = z
   .object({
     fullName: z.string().min(2, "Name must be at least 2 characters"),
+    username: z
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .max(32, "Username must be at most 32 characters")
+      .regex(
+        /^[a-zA-Z0-9_-]+$/,
+        "Username can only contain letters, numbers, underscores, and hyphens"
+      ),
     email: z.string().email("Please enter a valid email address"),
     password: z
       .string()
@@ -27,6 +35,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z
   .object({
+    code: z.string().min(1, "Verification code is required"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -39,7 +48,12 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const emailVerificationSchema = z.object({
+  code: z.string().min(6, "Enter the 6-digit code").max(6),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type EmailVerificationInput = z.infer<typeof emailVerificationSchema>;

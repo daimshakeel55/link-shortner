@@ -10,9 +10,9 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/4 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/15 blur-3xl" />
-        <div className="absolute top-1/2 right-0 size-[400px] translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 size-[300px] rounded-full bg-pink-500/8 blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full orb-primary blur-3xl" />
+        <div className="absolute top-1/2 right-0 size-[400px] translate-x-1/2 rounded-full orb-light blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 size-[300px] rounded-full orb-deep blur-3xl" />
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -26,9 +26,9 @@ export function Hero() {
       <div className="relative mx-auto max-w-6xl px-6 text-center">
         <FadeIn>
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-sm text-muted-foreground"
           >
             <Sparkles className="size-3.5 text-primary" />
@@ -54,7 +54,7 @@ export function Hero() {
 
         <FadeIn delay={3}>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <LinkButton href="/register" size="lg" className="glow-btn h-12 bg-gradient-to-r from-purple-600 to-violet-500 px-8 text-base hover:from-purple-500 hover:to-violet-400">
+            <LinkButton href="/register" size="lg" className="glow-btn btn-brand h-12 px-8 text-base">
               Start for free
               <ArrowRight className="ml-2 size-4" />
             </LinkButton>
@@ -71,10 +71,10 @@ export function Hero() {
 
         <FadeIn delay={4}>
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.7 }}
-            className="glow mx-auto mt-16 max-w-3xl rounded-2xl border border-purple-500/20 bg-card/80 p-1 backdrop-blur-sm"
+            transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="glow mx-auto mt-16 max-w-3xl rounded-2xl border border-primary/25 bg-card/80 p-1 backdrop-blur-sm"
           >
             <div className="rounded-xl bg-background p-6 md:p-8">
               <div className="flex items-center gap-3 border-b border-border pb-4">

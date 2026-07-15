@@ -14,6 +14,7 @@ export interface Database {
           id: string;
           email: string;
           full_name: string | null;
+          username: string | null;
           avatar_url: string | null;
           theme: "dark" | "light" | "system";
           created_at: string;
@@ -23,6 +24,7 @@ export interface Database {
           id: string;
           email: string;
           full_name?: string | null;
+          username?: string | null;
           avatar_url?: string | null;
           theme?: "dark" | "light" | "system";
           created_at?: string;
@@ -32,6 +34,7 @@ export interface Database {
           id?: string;
           email?: string;
           full_name?: string | null;
+          username?: string | null;
           avatar_url?: string | null;
           theme?: "dark" | "light" | "system";
           created_at?: string;

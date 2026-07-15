@@ -70,7 +70,7 @@ export function LinkForm({ link, mode = "create" }: LinkFormProps) {
         <div className="space-y-2">
           <Label htmlFor="originalUrl">Paste your long URL</Label>
           <div className="relative">
-            <Link2 className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-purple-400" />
+            <Link2 className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-primary" />
             <Input
               id="originalUrl"
               placeholder="https://example.com/your-long-url"
@@ -101,7 +101,7 @@ export function LinkForm({ link, mode = "create" }: LinkFormProps) {
         </div>
 
         {mode === "edit" && (
-          <div className="flex items-center justify-between rounded-xl border border-purple-500/15 p-4">
+          <div className="flex items-center justify-between rounded-xl border border-primary/15 p-4">
             <Label htmlFor="isActive">Link is active</Label>
             <Switch
               id="isActive"
@@ -115,7 +115,7 @@ export function LinkForm({ link, mode = "create" }: LinkFormProps) {
           <Button
             type="submit"
             disabled={loading}
-            className="glow-btn h-11 bg-gradient-to-r from-purple-600 to-violet-500 px-6"
+            className="glow-btn btn-brand h-11 px-6"
           >
             {loading ? (
               <Loader2 className="size-4 animate-spin" />

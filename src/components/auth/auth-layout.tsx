@@ -20,10 +20,11 @@ const highlights = [
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen">
-      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden border-r border-purple-500/15 bg-card/50 p-10 lg:flex">
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden border-r border-primary/15 bg-card/50 p-10 lg:flex">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/4 left-1/2 size-[500px] -translate-x-1/2 rounded-full bg-purple-500/20 blur-3xl" />
-          <div className="absolute bottom-1/4 right-0 size-[300px] rounded-full bg-cyan-500/15 blur-3xl" />
+          <div className="absolute top-1/4 left-1/2 size-[500px] -translate-x-1/2 rounded-full orb-primary blur-3xl" />
+          <div className="absolute bottom-1/4 right-0 size-[300px] rounded-full orb-light blur-3xl" />
+          <div className="absolute top-2/3 left-0 size-[200px] rounded-full orb-deep blur-3xl" />
           <div
             className="absolute inset-0 opacity-[0.03]"
             style={{
@@ -52,8 +53,8 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           <ul className="space-y-4">
             {highlights.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3 text-sm">
-                <div className="flex size-8 items-center justify-center rounded-lg bg-purple-500/20 ring-1 ring-purple-500/30">
-                  <Icon className="size-4 text-purple-300" />
+                <div className="flex size-8 items-center justify-center rounded-lg bg-primary/20 ring-1 ring-primary/30">
+                  <Icon className="size-4 text-primary" />
                 </div>
                 {text}
               </li>
@@ -72,9 +73,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
         </div>
 
         <motion.div
-          initial={false}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="w-full max-w-sm"
         >
           <div className="mb-8">

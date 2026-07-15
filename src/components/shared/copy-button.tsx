@@ -45,20 +45,20 @@ export function CopyButton({
         {copied ? (
           <motion.span
             key="check"
-            initial={{ scale: 0.5, opacity: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Check className="size-4 text-emerald-400" />
+            <Check className="size-4 text-primary" />
           </motion.span>
         ) : (
           <motion.span
             key="copy"
-            initial={{ scale: 0.5, opacity: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
             <Copy className="size-4" />
           </motion.span>

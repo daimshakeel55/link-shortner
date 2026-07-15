@@ -26,7 +26,7 @@ function FAQItem({
         <span className="text-sm font-medium">{question}</span>
         <ChevronDown
           className={cn(
-            "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+            "size-4 shrink-0 text-muted-foreground transition-transform duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
             open && "rotate-180"
           )}
         />
@@ -37,7 +37,7 @@ function FAQItem({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             <p className="pb-5 text-sm leading-relaxed text-muted-foreground">

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionUser } from "@/lib/auth/session";
+import { getDatabaseClient } from "@/lib/supabase/database";
 import { getShortUrl } from "@/lib/slug";
 import { generateQRCodeBuffer } from "@/lib/qrcode";
 
@@ -7,21 +8,19 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await getSessionUser();
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const { id } = await params;
+  const supabase = await getDatabaseClient();
 
   const { data: link } = await supabase
     .from("links")
     .select("slug")
     .eq("id", id)
-    .eq("user_id", user.id)
+    .eq("user_id", session.id)
     .single();
 
   if (!link) {

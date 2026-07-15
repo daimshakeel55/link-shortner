@@ -1,16 +1,30 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Transition, type Variants } from "framer-motion";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+/** Smooth ease-out curve — feels natural for entrances */
+export const smoothEase = [0.22, 1, 0.36, 1] as const;
+
+export const smoothTransition: Transition = {
+  duration: 0.65,
+  ease: smoothEase,
+};
+
+export const smoothSpring: Transition = {
+  type: "spring",
+  stiffness: 100,
+  damping: 22,
+  mass: 0.9,
+};
+
+export const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.1,
-      duration: 0.5,
-      ease: [0.25, 0.4, 0.25, 1] as const,
+      delay: i * 0.08,
+      ...smoothTransition,
     },
   }),
 };
@@ -26,7 +40,7 @@ export function FadeIn({ children, delay = 0, className }: FadeInProps) {
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-40px" }}
       custom={delay}
       variants={fadeUp}
       className={className}
@@ -47,11 +61,11 @@ export function StaggerContainer({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-40px" }}
       variants={{
         hidden: {},
         visible: {
-          transition: { staggerChildren: 0.1 },
+          transition: { staggerChildren: 0.08, delayChildren: 0.05 },
         },
       }}
       className={className}
@@ -71,11 +85,11 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
+        hidden: { opacity: 0, y: 16 },
         visible: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
+          transition: smoothTransition,
         },
       }}
       className={className}

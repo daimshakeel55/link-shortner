@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
+import { getDatabaseClient } from "@/lib/supabase/database";
 import { getDemoLinkById } from "@/lib/demo-store";
 import { DashboardHeader } from "@/components/dashboard/sidebar";
 import { LinkForm } from "@/components/links/link-form";
@@ -35,7 +35,7 @@ export default async function EditLinkPage({
     );
   }
 
-  const supabase = await createClient();
+  const supabase = await getDatabaseClient();
   const { data: link } = await supabase
     .from("links")
     .select("*")

@@ -19,8 +19,6 @@ import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/client";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -34,17 +32,13 @@ const navItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-
   async function handleSignOut() {
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = createClient();
-        await supabase.auth.signOut();
-      } catch {
-        // ignore
-      }
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      await fetch("/api/demo/login", { method: "DELETE" });
+    } catch {
+      // ignore
     }
-    await fetch("/api/demo/login", { method: "DELETE" });
     window.location.href = "/login";
   }
 
@@ -73,7 +67,7 @@ export function DashboardSidebar() {
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-300",
+                  "smooth-hover flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm",
                   isActive
                     ? "nav-glow-active font-medium text-primary"
                     : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -122,6 +116,7 @@ export function DashboardSidebar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden"
               onClick={() => setMobileOpen(false)}
             />
@@ -129,7 +124,7 @@ export function DashboardSidebar() {
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              transition={{ type: "spring", stiffness: 90, damping: 22, mass: 0.9 }}
               className="fixed inset-y-0 left-0 z-50 w-64 border-r border-border bg-sidebar md:hidden"
             >
               <Button
