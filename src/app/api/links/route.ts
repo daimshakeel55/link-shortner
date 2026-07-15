@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { getDatabaseClient } from "@/lib/supabase/database";
 import { createLinkSchema } from "@/lib/validations/link";
-import { generateSlug, getShortUrl, hashPassword } from "@/lib/slug";
+import { generateSlug, resolveShortUrl, hashPassword } from "@/lib/slug";
 import { rateLimit } from "@/lib/rate-limit";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import {
@@ -16,7 +16,8 @@ function filterDemoLinks(
   search: string,
   status: string | null,
   page: number,
-  pageSize: number
+  pageSize: number,
+  request: Request
 ) {
   let links = getDemoLinks(userId);
 
@@ -37,7 +38,7 @@ function filterDemoLinks(
   const from = (page - 1) * pageSize;
   const data = links.slice(from, from + pageSize).map((link) => ({
     ...link,
-    shortUrl: getShortUrl(link.slug),
+    shortUrl: resolveShortUrl(link.slug, request),
   }));
 
   return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
@@ -57,7 +58,7 @@ export async function GET(request: Request) {
 
   if (session.isDemo) {
     return NextResponse.json(
-      filterDemoLinks(session.id, search, status, page, pageSize)
+      filterDemoLinks(session.id, search, status, page, pageSize, request)
     );
   }
 
@@ -98,7 +99,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({
-    data: (data ?? []).map((link) => ({ ...link, shortUrl: getShortUrl(link.slug) })),
+    data: (data ?? []).map((link) => ({ ...link, shortUrl: resolveShortUrl(link.slug, request) })),
     total: count ?? 0,
     page,
     pageSize,
@@ -160,7 +161,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { ...link, shortUrl: getShortUrl(link.slug) },
+      { ...link, shortUrl: resolveShortUrl(link.slug, request) },
       { status: 201 }
     );
   }
@@ -214,7 +215,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    { ...data, shortUrl: getShortUrl(data.slug) },
+    { ...data, shortUrl: resolveShortUrl(data.slug, request) },
     { status: 201 }
   );
 }

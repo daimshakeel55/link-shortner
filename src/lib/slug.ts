@@ -1,5 +1,6 @@
 import { customAlphabet } from "nanoid";
-import { APP_URL, RESERVED_SLUGS, SLUG_MIN_LENGTH } from "@/lib/constants";
+import { getServerAppUrl } from "@/lib/app-url";
+import { RESERVED_SLUGS, SLUG_MIN_LENGTH } from "@/lib/constants";
 
 const nanoid = customAlphabet(
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -25,8 +26,36 @@ export function sanitizeSlug(input: string): string {
     .slice(0, 64);
 }
 
-export function getShortUrl(slug: string): string {
-  return `${APP_URL}/${slug}`;
+function isVercelDeploymentHost(hostname: string) {
+  return /-daim1\.vercel\.app$/i.test(hostname);
+}
+
+export function resolveShortUrl(slug: string, request?: Request) {
+  const configured = getServerAppUrl();
+  if (configured) {
+    return `${configured}/${slug}`;
+  }
+
+  if (request) {
+    const origin = new URL(request.url).origin;
+    const hostname = new URL(origin).hostname;
+    if (!isVercelDeploymentHost(hostname)) {
+      return `${origin.replace(/\/$/, "")}/${slug}`;
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (!isVercelDeploymentHost(hostname)) {
+      return `${window.location.origin.replace(/\/$/, "")}/${slug}`;
+    }
+  }
+
+  return `http://localhost:3000/${slug}`;
+}
+
+export function getShortUrl(slug: string) {
+  return resolveShortUrl(slug);
 }
 
 export async function hashPassword(password: string): Promise<string> {

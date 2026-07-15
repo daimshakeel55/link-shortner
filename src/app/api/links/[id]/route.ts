@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { getDatabaseClient } from "@/lib/supabase/database";
 import { updateLinkSchema } from "@/lib/validations/link";
-import { getShortUrl, hashPassword } from "@/lib/slug";
+import { resolveShortUrl, hashPassword } from "@/lib/slug";
 import type { Link, LinkUpdate } from "@/types/database";
 import {
   deleteDemoLink,
@@ -12,7 +12,7 @@ import {
 } from "@/lib/demo-store";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -25,7 +25,7 @@ export async function GET(
   if (session.isDemo) {
     const link = getDemoLinkById(session.id, id);
     if (!link) return NextResponse.json({ error: "Link not found" }, { status: 404 });
-    return NextResponse.json({ ...link, shortUrl: getShortUrl(link.slug) });
+    return NextResponse.json({ ...link, shortUrl: resolveShortUrl(link.slug, request) });
   }
 
   let supabase;
@@ -50,7 +50,7 @@ export async function GET(
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ ...data, shortUrl: getShortUrl(data.slug) });
+  return NextResponse.json({ ...data, shortUrl: resolveShortUrl(data.slug, request) });
 }
 
 export async function PATCH(
@@ -103,7 +103,7 @@ export async function PATCH(
     if (!data) {
       return NextResponse.json({ error: "Failed to update link" }, { status: 500 });
     }
-    return NextResponse.json({ ...data, shortUrl: getShortUrl(data.slug) });
+    return NextResponse.json({ ...data, shortUrl: resolveShortUrl(data.slug, request) });
   }
 
   let supabase;
@@ -160,7 +160,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Failed to update link" }, { status: 500 });
   }
 
-  return NextResponse.json({ ...data, shortUrl: getShortUrl(data.slug) });
+  return NextResponse.json({ ...data, shortUrl: resolveShortUrl(data.slug, request) });
 }
 
 export async function DELETE(

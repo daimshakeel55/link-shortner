@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { getDatabaseClient } from "@/lib/supabase/database";
-import { getShortUrl } from "@/lib/slug";
+import { resolveShortUrl } from "@/lib/slug";
 import { generateQRCodeBuffer } from "@/lib/qrcode";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSessionUser();
@@ -37,7 +37,7 @@ export async function GET(
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
 
-  const shortUrl = getShortUrl(link.slug);
+  const shortUrl = resolveShortUrl(link.slug, request);
   const buffer = await generateQRCodeBuffer(shortUrl);
 
   return new NextResponse(new Uint8Array(buffer), {
