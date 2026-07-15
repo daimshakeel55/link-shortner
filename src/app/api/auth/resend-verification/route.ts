@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 
-const verifySchema = z.object({
+const resendSchema = z.object({
   email: z.string().email(),
-  code: z.string().min(6).max(8),
 });
 
 export async function POST(request: Request) {
@@ -15,7 +14,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const parsed = verifySchema.safeParse(body);
+  const parsed = resendSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -31,15 +30,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const { error } = await supabase.auth.verifyOtp({
-    email: parsed.data.email,
-    token: parsed.data.code.trim(),
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
+    new URL(request.url).origin;
+
+  const { error } = await supabase.auth.resend({
     type: "signup",
+    email: parsed.data.email.trim(),
+    options: {
+      emailRedirectTo: `${appUrl}/auth/callback`,
+    },
   });
 
   if (error) {
     return NextResponse.json(
-      { error: error.message ?? "Invalid verification code" },
+      { error: error.message ?? "Could not resend verification email" },
       { status: 400 }
     );
   }

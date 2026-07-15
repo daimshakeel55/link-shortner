@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export function DemoButton() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   async function enterDemo() {
     const res = await fetch("/api/demo/login", { method: "POST" });
     if (!res.ok) {
@@ -22,7 +15,7 @@ export function DemoButton() {
     window.location.href = "/dashboard";
   }
 
-  if (!mounted || isSupabaseConfigured()) return null;
+  if (isSupabaseConfigured()) return null;
 
   return (
     <div className="mt-6 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center">

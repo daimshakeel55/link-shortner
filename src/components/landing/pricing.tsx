@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { PRICING_PLANS } from "@/lib/constants";
 import { LinkButton } from "@/components/shared/link-button";

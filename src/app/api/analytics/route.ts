@@ -47,7 +47,17 @@ export async function GET(request: Request) {
     });
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Analytics database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const since = getDateRangeFilter(period).toISOString();
 
   const { data: userLinks } = await supabase

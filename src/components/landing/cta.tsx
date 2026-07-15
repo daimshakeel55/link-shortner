@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { LinkButton } from "@/components/shared/link-button";
 import { FadeIn } from "@/components/shared/motion";

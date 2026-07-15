@@ -14,7 +14,17 @@ export async function GET(
   }
 
   const { id } = await params;
-  const supabase = await getDatabaseClient();
+
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("QR database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
 
   const { data: link } = await supabase
     .from("links")

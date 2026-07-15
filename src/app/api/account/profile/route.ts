@@ -17,7 +17,20 @@ export async function GET() {
     });
   }
 
-  const admin = await getDatabaseClient();
+  let admin;
+  try {
+    admin = getDatabaseClient();
+  } catch (error) {
+    console.error("Profile database error:", error);
+    return NextResponse.json(
+      {
+        fullName: session.fullName ?? "",
+        email: session.email ?? "",
+        avatarUrl: null,
+      }
+    );
+  }
+
   const { data: profile, error } = await admin
     .from("profiles")
     .select("full_name, email, avatar_url")
@@ -56,7 +69,17 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const admin = await getDatabaseClient();
+  let admin;
+  try {
+    admin = getDatabaseClient();
+  } catch (error) {
+    console.error("Profile update database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const { error } = await admin
     .from("profiles")
     .update({ full_name: parsed.data.fullName })

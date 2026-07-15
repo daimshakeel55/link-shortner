@@ -28,7 +28,17 @@ export async function GET(
     return NextResponse.json({ ...link, shortUrl: getShortUrl(link.slug) });
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Get link database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const { data, error } = await supabase
     .from("links")
     .select("*")
@@ -96,7 +106,17 @@ export async function PATCH(
     return NextResponse.json({ ...data, shortUrl: getShortUrl(data.slug) });
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Update link database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const updates: LinkUpdate = {};
 
   if (parsed.data.originalUrl) updates.original_url = parsed.data.originalUrl;
@@ -162,7 +182,17 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Delete link database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const { error } = await supabase
     .from("links")
     .delete()

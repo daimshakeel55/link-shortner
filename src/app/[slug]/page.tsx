@@ -34,6 +34,7 @@ async function trackSupabaseClick(linkId: string, headersList: Headers) {
 
     const visitorId = metadata.ip ? hashIp(metadata.ip) : crypto.randomUUID();
     const supabase = await createClient();
+    if (!supabase) return;
 
     await supabase.from("click_events").insert({
       link_id: linkId,
@@ -87,6 +88,10 @@ export default async function SlugPage({
   }
 
   const supabase = await createClient();
+  if (!supabase) {
+    notFound();
+  }
+
   const { data: link } = await supabase
     .from("links")
     .select("*")

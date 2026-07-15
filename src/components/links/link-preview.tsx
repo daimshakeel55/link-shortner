@@ -32,17 +32,16 @@ function AdSlot({ label = "Advertisement" }: { label?: string }) {
 }
 
 export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
-  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    Math.floor(Math.random() * 6) + 5
+  );
   const canContinue = secondsLeft === 0;
   const displayUrl = displayDestination(destinationUrl);
 
   useEffect(() => {
-    const waitSeconds = Math.floor(Math.random() * 6) + 5;
-    setSecondsLeft(waitSeconds);
-
     const timer = window.setInterval(() => {
       setSecondsLeft((prev) => {
-        if (prev === null || prev <= 1) {
+        if (prev <= 1) {
           window.clearInterval(timer);
           return 0;
         }

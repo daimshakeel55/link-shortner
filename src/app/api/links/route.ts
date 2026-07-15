@@ -61,7 +61,17 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Links API database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
+
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -155,7 +165,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = await getDatabaseClient();
+  let supabase;
+  try {
+    supabase = getDatabaseClient();
+  } catch (error) {
+    console.error("Create link database error:", error);
+    return NextResponse.json(
+      { error: "Database is not configured" },
+      { status: 503 }
+    );
+  }
 
   const { data: existing } = await supabase
     .from("links")

@@ -1,7 +1,7 @@
 "use client";
 
 import { STATS } from "@/lib/constants";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/shared/motion";
+import { StaggerContainer, StaggerItem } from "@/components/shared/motion";
 
 export function Statistics() {
   return (

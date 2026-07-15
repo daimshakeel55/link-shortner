@@ -49,14 +49,12 @@ function SignedInNav({ variant }: { variant: "desktop" | "mobile" }) {
 }
 
 export function LandingAuthNav({ variant }: { variant: "desktop" | "mobile" }) {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const configured = isSupabaseConfigured();
+  const [isLoaded, setIsLoaded] = useState(!configured);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setIsLoaded(true);
-      return;
-    }
+    if (!configured) return;
 
     void (async () => {
       try {
@@ -71,9 +69,9 @@ export function LandingAuthNav({ variant }: { variant: "desktop" | "mobile" }) {
         setIsLoaded(true);
       }
     })();
-  }, []);
+  }, [configured]);
 
-  if (!isSupabaseConfigured() || !isLoaded) {
+  if (!configured || !isLoaded) {
     return <GuestNav variant={variant} />;
   }
 

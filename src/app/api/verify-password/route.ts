@@ -28,6 +28,12 @@ export async function POST(request: Request) {
   const { slug, password } = body as { slug: string; password: string };
 
   const supabase = await createClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { error: "Service unavailable" },
+      { status: 503 }
+    );
+  }
 
   const { data: link } = await supabase
     .from("links")

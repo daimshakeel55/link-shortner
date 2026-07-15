@@ -19,27 +19,41 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, password, username, fullName } = parsed.data;
-  const admin = createAdminClient();
-
-  const { data: existingUsername } = await admin
-    .from("profiles")
-    .select("id")
-    .eq("username", username.trim())
-    .maybeSingle();
-
-  if (existingUsername) {
+  const supabase = await createClient();
+  if (!supabase) {
     return NextResponse.json(
-      { error: "Username is already taken" },
-      { status: 409 }
+      { error: "Authentication service is not configured" },
+      { status: 503 }
     );
   }
 
-  const supabase = await createClient();
+  const { email, password, username, fullName } = parsed.data;
+  const admin = createAdminClient();
+
+  if (admin) {
+    const { data: existingUsername } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("username", username.trim())
+      .maybeSingle();
+
+    if (existingUsername) {
+      return NextResponse.json(
+        { error: "Username is already taken" },
+        { status: 409 }
+      );
+    }
+  }
+
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
+    new URL(request.url).origin;
+
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
     options: {
+      emailRedirectTo: `${appUrl}/auth/callback`,
       data: {
         username: username.trim(),
         full_name: fullName.trim(),

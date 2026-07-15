@@ -29,6 +29,13 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { error: "Authentication service is not configured" },
+      { status: 503 }
+    );
+  }
+
   const { error: verifyError } = await supabase.auth.signInWithPassword({
     email: session.email,
     password: parsed.data.currentPassword,

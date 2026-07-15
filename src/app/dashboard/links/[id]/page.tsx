@@ -4,6 +4,29 @@ import { getDatabaseClient } from "@/lib/supabase/database";
 import { getDemoLinkById } from "@/lib/demo-store";
 import { DashboardHeader } from "@/components/dashboard/sidebar";
 import { LinkForm } from "@/components/links/link-form";
+import type { Link } from "@/types/database";
+
+async function loadLink(sessionId: string, linkId: string): Promise<Link | null> {
+  try {
+    const supabase = getDatabaseClient();
+    const { data: link, error } = await supabase
+      .from("links")
+      .select("*")
+      .eq("id", linkId)
+      .eq("user_id", sessionId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Edit link fetch failed:", error.message);
+      return null;
+    }
+
+    return link;
+  } catch (error) {
+    console.error("Edit link page failed:", error);
+    return null;
+  }
+}
 
 export default async function EditLinkPage({
   params,
@@ -35,14 +58,7 @@ export default async function EditLinkPage({
     );
   }
 
-  const supabase = await getDatabaseClient();
-  const { data: link } = await supabase
-    .from("links")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", session.id)
-    .single();
-
+  const link = await loadLink(session.id, id);
   if (!link) redirect("/dashboard/links");
 
   return (

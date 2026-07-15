@@ -10,15 +10,33 @@ export function isSupabaseConfigured(): boolean {
   return url.startsWith("http");
 }
 
-export function getSupabaseEnv() {
-  if (!isSupabaseConfigured()) {
-    throw new Error(
-      "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local"
-    );
-  }
+export function isServiceRoleConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) return false;
+  if (key.includes("your_supabase") || key.includes("your_service_role")) return false;
+  return url.startsWith("http");
+}
+
+export function getSupabaseEnv():
+  | { url: string; anonKey: string }
+  | null {
+  if (!isSupabaseConfigured()) return null;
 
   return {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  };
+}
+
+export function getServiceRoleEnv():
+  | { url: string; serviceRoleKey: string }
+  | null {
+  if (!isServiceRoleConfigured()) return null;
+
+  return {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
   };
 }

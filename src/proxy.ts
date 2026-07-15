@@ -29,26 +29,53 @@ function hasDemoSession(req: NextRequest) {
 }
 
 export default async function proxy(request: NextRequest) {
-  const { supabaseResponse, user } = await updateSession(request);
-  const { pathname } = request.nextUrl;
-  const isAuthenticated = Boolean(user) || hasDemoSession(request);
+  try {
+    const { pathname, searchParams } = request.nextUrl;
 
-  if (matchesPrefix(pathname, protectedPrefixes) && !isAuthenticated) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    // Supabase magic-link emails may land on Site URL root with ?code=
+    if (pathname === "/" && searchParams.has("code")) {
+      const callbackUrl = new URL("/auth/callback", request.url);
+      searchParams.forEach((value, key) => {
+        callbackUrl.searchParams.set(key, value);
+      });
+      return NextResponse.redirect(callbackUrl);
+    }
+
+    // Supabase auth errors (expired link, etc.) on Site URL root
+    if (pathname === "/" && searchParams.has("error")) {
+      const message =
+        searchParams.get("error_description") ??
+        searchParams.get("error_code") ??
+        searchParams.get("error") ??
+        "Authentication failed";
+      const registerUrl = new URL("/register", request.url);
+      registerUrl.searchParams.set("error", message);
+      return NextResponse.redirect(registerUrl);
+    }
+
+    const { supabaseResponse, user } = await updateSession(request);
+    const isAuthenticated = Boolean(user) || hasDemoSession(request);
+
+    if (matchesPrefix(pathname, protectedPrefixes) && !isAuthenticated) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (matchesPrefix(pathname, authPrefixes) && user) {
+      const redirectParam = request.nextUrl.searchParams.get("redirect");
+      const destination =
+        redirectParam?.startsWith("/") && !redirectParam.startsWith("//")
+          ? redirectParam
+          : "/dashboard";
+      return NextResponse.redirect(new URL(destination, request.url));
+    }
+
+    return supabaseResponse;
+  } catch (error) {
+    console.error("Proxy middleware failed:", error);
+    return NextResponse.next({ request });
   }
-
-  if (matchesPrefix(pathname, authPrefixes) && user) {
-    const redirectParam = request.nextUrl.searchParams.get("redirect");
-    const destination =
-      redirectParam?.startsWith("/") && !redirectParam.startsWith("//")
-        ? redirectParam
-        : "/dashboard";
-    return NextResponse.redirect(new URL(destination, request.url));
-  }
-
-  return supabaseResponse;
 }
 
 export const config = {

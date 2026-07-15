@@ -15,10 +15,17 @@ export async function DELETE() {
   }
 
   try {
-    const admin = await getDatabaseClient();
+    const admin = getDatabaseClient();
     await admin.from("profiles").delete().eq("id", session.id);
 
     const authAdmin = createAdminClient();
+    if (!authAdmin) {
+      return NextResponse.json(
+        { error: "Account deletion is not configured" },
+        { status: 503 }
+      );
+    }
+
     const { error } = await authAdmin.auth.admin.deleteUser(session.id);
 
     if (error) {
