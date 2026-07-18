@@ -24,11 +24,29 @@ function displayDestination(url: string): string {
   }
 }
 
-function AdSlot({ label = "Advertisement" }: { label?: string }) {
+function BannerAd() {
+  useEffect(() => {
+    (window as Window & { atOptions: Record<string, unknown> }).atOptions = {
+      key: "24bad21b4aef70d3dce21986be02ee00",
+      format: "iframe",
+      height: 90,
+      width: 728,
+      params: {},
+    };
+
+    const script = document.createElement("script");
+    script.src =
+      "https://www.highperformanceformat.com/24bad21b4aef70d3dce21986be02ee00/invoke.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, []);
+
   return (
-    <div className="flex min-h-[90px] w-full items-center justify-center rounded-xl border border-dashed border-primary/25 bg-card/40 px-6 py-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
-    </div>
+    <div className="flex min-h-[90px] w-full items-center justify-center overflow-x-auto" />
   );
 }
 
@@ -73,8 +91,6 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
       </header>
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
-        <AdSlot />
-
         <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg md:p-8">
           <p className="text-center text-sm text-muted-foreground">
             Here&apos;s a preview of your destination
@@ -125,7 +141,7 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
           <p className="mt-4 text-center text-sm text-muted-foreground">{statusText}</p>
         </div>
 
-        <AdSlot label="Sponsored content" />
+        <BannerAd />
       </main>
 
       <footer className="mt-auto border-t border-border/60 bg-card/60 px-6 py-10">
