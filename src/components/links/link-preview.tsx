@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { ArrowRight, CheckCircle2, Globe, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,12 @@ function displayDestination(url: string): string {
 }
 
 function BannerAd() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     (window as unknown as { atOptions: Record<string, unknown> }).atOptions = {
       key: "24bad21b4aef70d3dce21986be02ee00",
       format: "iframe",
@@ -38,15 +43,19 @@ function BannerAd() {
     script.src =
       "https://www.highperformanceformat.com/24bad21b4aef70d3dce21986be02ee00/invoke.js";
     script.async = true;
-    document.body.appendChild(script);
+    container.appendChild(script);
 
     return () => {
       script.remove();
+      container.replaceChildren();
     };
   }, []);
 
   return (
-    <div className="flex min-h-[90px] w-full items-center justify-center overflow-x-auto" />
+    <div
+      ref={containerRef}
+      className="mx-auto flex w-full max-w-[728px] items-center justify-center overflow-x-auto"
+    />
   );
 }
 
@@ -144,7 +153,7 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
         <BannerAd />
       </main>
 
-      <footer className="mt-auto border-t border-border/60 bg-card/60 px-6 py-10">
+      <footer className="border-t border-border/60 bg-card/60 px-6 py-10">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-2xl font-semibold text-gradient-vibrant md:text-3xl">
             This preview is powered by {APP_NAME}
