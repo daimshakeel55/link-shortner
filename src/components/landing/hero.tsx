@@ -83,7 +83,7 @@ export function Hero() {
                   <div className="size-3 rounded-full bg-green-500/60" />
                 </div>
                 <div className="flex-1 rounded-md bg-muted px-4 py-1.5 text-left text-sm text-muted-foreground">
-                  linkly.app/dashboard
+                  sharkvault.app/dashboard
                 </div>
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-3">

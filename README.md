@@ -1,4 +1,4 @@
-# Linkly — Premium URL Shortener
+# SharkVault — Premium URL Shortener
 
 A production-ready SaaS URL shortener built with Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion, and Supabase.
 
@@ -56,7 +56,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_APP_NAME=Linkly
+NEXT_PUBLIC_APP_NAME=SharkVault
 ```
 
 ### 4. Run the development server
@@ -129,7 +129,7 @@ Add these in Vercel → Project → Settings → Environment Variables:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server only) |
 | `NEXT_PUBLIC_APP_URL` | `https://your-domain.vercel.app` (or custom domain) |
-| `NEXT_PUBLIC_APP_NAME` | `Linkly` |
+| `NEXT_PUBLIC_APP_NAME` | `SharkVault` |
 
 ### 4. Supabase production settings
 

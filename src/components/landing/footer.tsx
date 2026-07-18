@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
+import { APP_NAME } from "@/lib/constants";
 
 const footerLinks = {
   Product: [
@@ -49,7 +50,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Linkly. All rights reserved.
+            &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </p>
           <div className="flex gap-6">
             <Link

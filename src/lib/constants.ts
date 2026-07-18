@@ -1,4 +1,4 @@
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "Linkly";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "SharkVault";
 
 function resolveAppUrl() {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
@@ -99,7 +99,7 @@ export const PRICING_PLANS = [
 
 export const FAQ_ITEMS = [
   {
-    question: "How does Linkly work?",
+    question: `How does ${APP_NAME} work?`,
     answer:
       "Paste your long URL, customize your short link, and share it anywhere. We handle redirects, analytics, and security in the background.",
   },

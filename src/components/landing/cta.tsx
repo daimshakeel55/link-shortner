@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { LinkButton } from "@/components/shared/link-button";
 import { FadeIn } from "@/components/shared/motion";
+import { APP_NAME } from "@/lib/constants";
 
 export function CTA() {
   return (
@@ -18,7 +19,7 @@ export function CTA() {
                 Ready to shorten smarter?
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-                Join thousands of teams using Linkly to create, manage, and
+                Join thousands of teams using {APP_NAME} to create, manage, and
                 analyze their links. Free to start, no credit card required.
               </p>
               <LinkButton href="/register" size="lg" className="mt-8 h-12 px-8">

@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import type { Link } from "@/types/database";
 
-export const DEMO_COOKIE = "linkly_demo_user";
+export const DEMO_COOKIE = "sharkvault_demo_user";
 
 type DemoLink = Link;
 

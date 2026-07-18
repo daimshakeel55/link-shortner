@@ -12,7 +12,7 @@ export async function GET() {
   if (session.isDemo) {
     return NextResponse.json({
       fullName: session.fullName ?? "Demo User",
-      email: "demo@linkly.app",
+      email: "demo@sharkvault.app",
       avatarUrl: null,
     });
   }
