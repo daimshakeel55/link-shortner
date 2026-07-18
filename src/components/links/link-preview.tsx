@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, Globe, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
@@ -31,47 +31,42 @@ function AdSlot({ label = "Advertisement" }: { label?: string }) {
   );
 }
 
+const COUNTDOWN_SECONDS = 5;
+
 export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
-  const [secondsLeft, setSecondsLeft] = useState(() =>
-    Math.floor(Math.random() * 6) + 5
-  );
-  const canContinue = secondsLeft === 0;
+  const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN_SECONDS);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const canContinue = secondsLeft === 0 && !isRedirecting;
   const displayUrl = displayDestination(destinationUrl);
 
+  const goToDestination = useCallback(() => {
+    if (isRedirecting) return;
+    setIsRedirecting(true);
+    window.location.assign(destinationUrl);
+  }, [destinationUrl, isRedirecting]);
+
   useEffect(() => {
+    if (secondsLeft <= 0) return;
+
     const timer = window.setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          window.clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setSecondsLeft((prev) => Math.max(prev - 1, 0));
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [secondsLeft]);
 
   useEffect(() => {
-    if (secondsLeft !== 0) return;
+    if (secondsLeft !== 0 || isRedirecting) return;
 
-    const auto = window.setTimeout(() => {
-      window.location.href = destinationUrl;
-    }, 1500);
-
+    const auto = window.setTimeout(goToDestination, 2000);
     return () => window.clearTimeout(auto);
-  }, [secondsLeft, destinationUrl]);
+  }, [secondsLeft, isRedirecting, goToDestination]);
 
-  function handleContinue() {
-    window.location.href = destinationUrl;
-  }
-
-  const statusText =
-    secondsLeft === null
-      ? "Please wait..."
-      : canContinue
-        ? "Redirecting you now..."
-        : `You'll be redirected in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}...`;
+  const statusText = isRedirecting
+    ? "Redirecting you now..."
+    : canContinue
+      ? "Click continue below, or you'll be redirected automatically..."
+      : `You'll be redirected in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}...`;
 
   return (
     <div className="mesh-bg flex min-h-screen flex-col">
@@ -123,7 +118,7 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
               !canContinue && "pointer-events-none opacity-50"
             )}
             disabled={!canContinue}
-            onClick={handleContinue}
+            onClick={goToDestination}
           >
             Continue to destination
             <ArrowRight className="ml-2 size-4" />
