@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Script from "next/script";
 import { ArrowRight, CheckCircle2, Globe, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
@@ -63,6 +64,10 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
 
   return (
     <div className="mesh-bg flex min-h-screen flex-col">
+      <Script
+        src="https://pl27693567.effectivecpmnetwork.com/cd/3f/fe/cd3ffe0bd3e021b13c29efaf91048401.js"
+        strategy="afterInteractive"
+      />
       <header className="border-b border-border/60 px-6 py-4">
         <Logo />
       </header>
