@@ -55,18 +55,11 @@ export function LinkPreview({ destinationUrl, slug }: LinkPreviewProps) {
     return () => window.clearInterval(timer);
   }, [secondsLeft]);
 
-  useEffect(() => {
-    if (secondsLeft !== 0 || isRedirecting) return;
-
-    const auto = window.setTimeout(goToDestination, 2000);
-    return () => window.clearTimeout(auto);
-  }, [secondsLeft, isRedirecting, goToDestination]);
-
   const statusText = isRedirecting
     ? "Redirecting you now..."
     : canContinue
-      ? "Click continue below, or you'll be redirected automatically..."
-      : `You'll be redirected in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}...`;
+      ? "Click the button below to continue to your destination."
+      : `Please wait ${secondsLeft} second${secondsLeft === 1 ? "" : "s"} before continuing...`;
 
   return (
     <div className="mesh-bg flex min-h-screen flex-col">
