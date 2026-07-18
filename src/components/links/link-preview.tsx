@@ -26,7 +26,7 @@ function displayDestination(url: string): string {
 
 function BannerAd() {
   useEffect(() => {
-    (window as Window & { atOptions: Record<string, unknown> }).atOptions = {
+    (window as unknown as { atOptions: Record<string, unknown> }).atOptions = {
       key: "24bad21b4aef70d3dce21986be02ee00",
       format: "iframe",
       height: 90,
