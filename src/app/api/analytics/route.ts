@@ -8,6 +8,37 @@ import {
   getDateRangeFilter,
 } from "@/lib/analytics";
 import { getDemoLinks } from "@/lib/demo-store";
+import type { ClickEvent } from "@/types/database";
+
+const EVENTS_PAGE_SIZE = 1000;
+
+async function fetchAllClickEvents(
+  supabase: ReturnType<typeof getDatabaseClient>,
+  linkIds: string[],
+  since: string
+) {
+  const allEvents: ClickEvent[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from("click_events")
+      .select("*")
+      .in("link_id", linkIds)
+      .gte("created_at", since)
+      .order("created_at", { ascending: true })
+      .range(from, from + EVENTS_PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data?.length) break;
+
+    allEvents.push(...data);
+    if (data.length < EVENTS_PAGE_SIZE) break;
+    from += EVENTS_PAGE_SIZE;
+  }
+
+  return allEvents;
+}
 
 export async function GET(request: Request) {
   const session = await getSessionUser();
@@ -35,6 +66,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       totalClicks,
+      allTimeClicks: totalClicks,
       uniqueVisitors: totalClicks,
       timeSeries: [],
       countries: [],
@@ -64,14 +96,17 @@ export async function GET(request: Request) {
     .from("links")
     .select("id, slug, title, click_count")
     .eq("user_id", session.id)
-    .order("click_count", { ascending: false })
-    .limit(10);
+    .order("click_count", { ascending: false });
 
-  const linkIds = linkId ? [linkId] : (userLinks ?? []).map((l) => l.id);
+  const allLinks = userLinks ?? [];
+  const topLinks = allLinks.slice(0, 10);
+  const linkIds = linkId ? [linkId] : allLinks.map((l) => l.id);
+  const allTimeClicks = allLinks.reduce((sum, l) => sum + l.click_count, 0);
 
   if (linkIds.length === 0) {
     return NextResponse.json({
       totalClicks: 0,
+      allTimeClicks: 0,
       uniqueVisitors: 0,
       timeSeries: [],
       countries: [],
@@ -84,17 +119,21 @@ export async function GET(request: Request) {
     });
   }
 
-  const { data: events } = await supabase
-    .from("click_events")
-    .select("*")
-    .in("link_id", linkIds)
-    .gte("created_at", since)
-    .order("created_at", { ascending: true });
+  let allEvents: ClickEvent[] = [];
 
-  const allEvents = events ?? [];
+  try {
+    allEvents = await fetchAllClickEvents(supabase, linkIds, since);
+  } catch (error) {
+    console.error("Analytics events fetch error:", error);
+    return NextResponse.json(
+      { error: "Failed to load analytics" },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({
     totalClicks: allEvents.length,
+    allTimeClicks,
     uniqueVisitors: countUniqueVisitors(allEvents),
     timeSeries: buildTimeSeries(allEvents, period),
     countries: aggregateByField(allEvents, "country"),
@@ -103,6 +142,6 @@ export async function GET(request: Request) {
     browsers: aggregateByField(allEvents, "browser"),
     operatingSystems: aggregateByField(allEvents, "os"),
     referrers: aggregateByField(allEvents, "referrer"),
-    topLinks: userLinks ?? [],
+    topLinks,
   });
 }

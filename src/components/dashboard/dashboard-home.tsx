@@ -62,7 +62,11 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
           <p className="text-sm text-muted-foreground">Views</p>
           <p className="mt-2 text-3xl font-semibold">
-            {(analytics?.totalClicks ?? totalViews).toLocaleString()}
+            {(
+              analytics?.allTimeClicks ??
+              analytics?.totalClicks ??
+              totalViews
+            ).toLocaleString()}
           </p>
         </div>
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
