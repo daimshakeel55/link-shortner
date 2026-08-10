@@ -69,10 +69,29 @@ async function deleteLink(id: string): Promise<void> {
   }
 }
 
-export function useLinks(params: LinksQueryParams = {}) {
+export function useLinks(params: LinksQueryParams = {}, options?: { refetchInterval?: number }) {
   return useQuery({
     queryKey: ["links", params],
     queryFn: () => fetchLinks(params),
+    staleTime: 0,
+    refetchInterval: options?.refetchInterval,
+  });
+}
+
+export function useDashboardStats() {
+  return useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/dashboard/stats");
+      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      return res.json() as Promise<{
+        totalLinks: number;
+        totalViews: number;
+        uniqueVisitors: number;
+      }>;
+    },
+    staleTime: 0,
+    refetchInterval: 10_000,
   });
 }
 
@@ -83,6 +102,7 @@ export function useCreateLink() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
       queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
   });
 }
@@ -95,6 +115,7 @@ export function useUpdateLink() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
       queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
   });
 }
@@ -106,6 +127,7 @@ export function useDeleteLink() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["links"] });
       queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
   });
 }

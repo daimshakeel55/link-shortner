@@ -7,7 +7,7 @@ import { ShortenWidget } from "@/components/links/shorten-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAnalytics, useDeleteLink, useLinks } from "@/hooks/use-links";
+import { useDashboardStats, useDeleteLink, useLinks } from "@/hooks/use-links";
 import { getShortUrl } from "@/lib/slug";
 
 interface DashboardHomeProps {
@@ -15,12 +15,11 @@ interface DashboardHomeProps {
 }
 
 export function DashboardHome({ userName }: DashboardHomeProps) {
-  const { data, isLoading, refetch } = useLinks({ page: 1 });
-  const { data: analytics } = useAnalytics("daily");
+  const { data, isLoading, refetch } = useLinks({ page: 1 }, { refetchInterval: 10_000 });
+  const { data: stats } = useDashboardStats();
   const deleteLink = useDeleteLink();
 
   const links = data?.data ?? [];
-  const totalViews = links.reduce((sum, link) => sum + link.click_count, 0);
 
   async function handleDelete(id: string) {
     try {
@@ -57,22 +56,18 @@ export function DashboardHome({ userName }: DashboardHomeProps) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
           <p className="text-sm text-muted-foreground">Links</p>
-          <p className="mt-2 text-3xl font-semibold">{links.length}</p>
+          <p className="mt-2 text-3xl font-semibold">{stats?.totalLinks ?? links.length}</p>
         </div>
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
           <p className="text-sm text-muted-foreground">Views</p>
           <p className="mt-2 text-3xl font-semibold">
-            {(
-              analytics?.allTimeClicks ??
-              analytics?.totalClicks ??
-              totalViews
-            ).toLocaleString()}
+            {(stats?.totalViews ?? 0).toLocaleString()}
           </p>
         </div>
         <div className="rounded-xl border border-border/60 bg-card/50 px-6 py-5">
           <p className="text-sm text-muted-foreground">Visitors</p>
           <p className="mt-2 text-3xl font-semibold">
-            {(analytics?.uniqueVisitors ?? 0).toLocaleString()}
+            {(stats?.uniqueVisitors ?? 0).toLocaleString()}
           </p>
         </div>
       </div>

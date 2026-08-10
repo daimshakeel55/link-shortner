@@ -166,6 +166,10 @@ export interface Database {
         Args: { link_uuid: string };
         Returns: undefined;
       };
+      get_unique_visitor_count: {
+        Args: { link_uuids: string[] };
+        Returns: number;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
