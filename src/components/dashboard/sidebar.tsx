@@ -53,7 +53,7 @@ export function DashboardSidebar() {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center px-6">
-        <Logo />
+        <Logo href="/dashboard" />
       </div>
       <Separator />
       <ScrollArea className="flex-1 px-3 py-4">

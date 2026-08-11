@@ -6,11 +6,12 @@ import { cn } from "@/lib/utils";
 interface LogoProps {
   className?: string;
   showText?: boolean;
+  href?: string;
 }
 
-export function Logo({ className, showText = true }: LogoProps) {
+export function Logo({ className, showText = true, href = "/" }: LogoProps) {
   return (
-    <Link href="/" className={cn("flex items-center gap-2.5", className)}>
+    <Link href={href} className={cn("flex items-center gap-2.5", className)}>
       <Image
         src="/sharkvault-logo.png"
         alt={`${APP_NAME} logo`}
