@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ExternalLink,
+  Link2,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -11,7 +12,6 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { DashboardHeader } from "@/components/dashboard/sidebar";
 import { LinkButton } from "@/components/shared/link-button";
@@ -51,6 +51,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useLinks, useDeleteLink } from "@/hooks/use-links";
+import { getShortUrl } from "@/lib/slug";
 
 export function LinksPageContent() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export function LinksPageContent() {
         </LinkButton>
       </DashboardHeader>
 
-      <div className="space-y-6 p-4 sm:p-6 md:p-8">
+      <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6 md:p-8">
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -123,15 +124,16 @@ export function LinksPageContent() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full rounded-xl" />
+              <Skeleton key={i} className="h-16 w-full rounded-lg" />
             ))}
           </div>
         ) : !data?.data.length ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16">
-            <p className="text-lg font-medium">No links found</p>
-            <p className="mt-2 text-sm text-muted-foreground">
+          <div className="rounded-xl border border-dashed border-border/60 py-12 text-center">
+            <Link2 className="mx-auto size-8 text-muted-foreground" />
+            <p className="mt-3 text-base font-medium">No links found</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               {search ? "Try a different search term" : "Create your first link to get started"}
             </p>
             {!search && (
@@ -143,79 +145,80 @@ export function LinksPageContent() {
           </div>
         ) : (
           <>
-            <div className="space-y-3">
-              {data.data.map((link) => (
-                <div
-                  key={link.id}
-                  className="glow-card flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:gap-4"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="max-w-full truncate font-medium">
-                        {link.title || link.shortUrl}
-                      </p>
-                      <Badge variant={link.is_active ? "default" : "secondary"}>
-                        {link.is_active ? "Active" : "Disabled"}
-                      </Badge>
-                    </div>
-                    <div className="mt-1 flex min-w-0 items-center gap-2">
-                      <p className="truncate text-sm text-primary">
-                        {link.shortUrl}
-                      </p>
-                      <CopyButton value={link.shortUrl} size="sm" />
-                    </div>
-                    <p className="mt-1 truncate text-xs text-muted-foreground">
-                      {link.original_url} ·{" "}
-                      {formatDistanceToNow(new Date(link.created_at), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
+            <div className="divide-y divide-border/60 rounded-xl border border-border/60">
+              {data.data.map((link) => {
+                const shortUrl = link.shortUrl ?? getShortUrl(link.slug);
 
-                  <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-start">
-                    <div className="text-left sm:text-right">
-                      <p className="text-xl font-semibold">{link.click_count}</p>
-                      <p className="text-xs text-muted-foreground">clicks</p>
+                return (
+                  <div
+                    key={link.id}
+                    className="flex flex-col gap-3 px-4 py-4 first:rounded-t-xl last:rounded-b-xl sm:flex-row sm:items-center sm:gap-4 sm:px-5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="max-w-full truncate text-sm font-medium sm:text-base">
+                          {shortUrl}
+                        </p>
+                        <CopyButton value={shortUrl} />
+                        {!link.is_active && (
+                          <Badge variant="secondary">Off</Badge>
+                        )}
+                      </div>
+                      <p className="mt-1 truncate text-sm text-muted-foreground">
+                        {link.original_url}
+                      </p>
                     </div>
 
-                    <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/dashboard/links/${link.id}`)}
-                      >
-                        <Pencil className="mr-2 size-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => window.open(link.original_url, "_blank")}
-                      >
-                        <ExternalLink className="mr-2 size-4" />
-                        Open destination
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setQrId(link.id)}>
-                        <QrCode className="mr-2 size-4" />
-                        QR Code
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => setDeleteId(link.id)}
-                      >
-                        <Trash2 className="mr-2 size-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center justify-between gap-3 sm:shrink-0 sm:justify-end">
+                      <div className="text-left sm:text-right">
+                        <p className="text-base font-semibold">{link.click_count}</p>
+                        <p className="text-sm text-muted-foreground">views</p>
+                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="shrink-0 text-muted-foreground"
+                              aria-label="Link options"
+                            >
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          }
+                        />
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/dashboard/links/${link.id}`)}
+                          >
+                            <Pencil className="mr-2 size-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => window.open(link.original_url, "_blank")}
+                          >
+                            <ExternalLink className="mr-2 size-4" />
+                            Open destination
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setQrId(link.id)}>
+                            <QrCode className="mr-2 size-4" />
+                            QR Code
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => setDeleteId(link.id)}
+                          >
+                            <Trash2 className="mr-2 size-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {data.totalPages > 1 && (
