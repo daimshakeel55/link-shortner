@@ -1,5 +1,6 @@
 import { UAParser } from "ua-parser-js";
-import type { ClickEvent } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ClickEvent, Database } from "@/types/database";
 import type { AnalyticsBreakdown, TimeSeriesPoint } from "@/types";
 
 interface RequestMetadata {
@@ -93,6 +94,48 @@ export function countUniqueVisitors(events: ClickEvent[]): number {
   for (const event of events) {
     if (event.visitor_id) visitors.add(event.visitor_id);
   }
+  return visitors.size;
+}
+
+const VISITOR_PAGE_SIZE = 1000;
+
+export async function countUniqueVisitorsFromDb(
+  supabase: SupabaseClient<Database>,
+  linkIds: string[]
+): Promise<number> {
+  if (linkIds.length === 0) return 0;
+
+  const { data: rpcCount, error: rpcError } = await supabase.rpc(
+    "get_unique_visitor_count",
+    { link_uuids: linkIds }
+  );
+
+  if (!rpcError && rpcCount != null) {
+    return Number(rpcCount);
+  }
+
+  const visitors = new Set<string>();
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from("click_events")
+      .select("visitor_id")
+      .in("link_id", linkIds)
+      .not("visitor_id", "is", null)
+      .range(from, from + VISITOR_PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data?.length) break;
+
+    for (const row of data) {
+      if (row.visitor_id) visitors.add(row.visitor_id);
+    }
+
+    if (data.length < VISITOR_PAGE_SIZE) break;
+    from += VISITOR_PAGE_SIZE;
+  }
+
   return visitors.size;
 }
 

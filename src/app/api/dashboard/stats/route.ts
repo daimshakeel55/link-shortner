@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { getDatabaseClient } from "@/lib/supabase/database";
+import { countUniqueVisitorsFromDb } from "@/lib/analytics";
 import { getDemoLinks } from "@/lib/demo-store";
 
 export async function GET() {
@@ -52,13 +53,10 @@ export async function GET() {
   let uniqueVisitors = 0;
 
   if (linkIds.length > 0) {
-    const { data, error: visitorError } = await supabase.rpc(
-      "get_unique_visitor_count",
-      { link_uuids: linkIds }
-    );
-
-    if (!visitorError && data != null) {
-      uniqueVisitors = Number(data);
+    try {
+      uniqueVisitors = await countUniqueVisitorsFromDb(supabase, linkIds);
+    } catch (error) {
+      console.error("Dashboard unique visitors error:", error);
     }
   }
 
