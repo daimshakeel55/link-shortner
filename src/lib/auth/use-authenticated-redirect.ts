@@ -28,7 +28,6 @@ export function useAuthenticatedRedirect(redirectPath: string) {
         });
 
         if (response.ok) {
-          setIsSignedIn(true);
           setIsRedirecting(true);
           navigateAfterAuth(destination);
           return;

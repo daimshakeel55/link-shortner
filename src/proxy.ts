@@ -60,8 +60,8 @@ export default async function proxy(request: NextRequest) {
       const redirectResponse = NextResponse.redirect(
         new URL("/dashboard", request.url)
       );
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie);
+      supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+        redirectResponse.cookies.set(name, value);
       });
       return redirectResponse;
     }
