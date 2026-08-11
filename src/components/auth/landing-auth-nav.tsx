@@ -25,14 +25,14 @@ export function LandingAuthNav({ variant }: { variant: "desktop" | "mobile" }) {
     if (isMobile) {
       return (
         <div className="flex flex-col gap-2 pt-2">
-          <LinkButton href="/dashboard">Go to Dashboard</LinkButton>
+          <LinkButton href="/dashboard">Dashboard</LinkButton>
         </div>
       );
     }
 
     return (
       <LinkButton href="/dashboard" size="sm">
-        Go to Dashboard
+        Dashboard
       </LinkButton>
     );
   }
