@@ -62,7 +62,7 @@ export async function GET(request: Request) {
 
   const { data: userLinks } = await supabase
     .from("links")
-    .select("id, slug, title, click_count")
+    .select("id, slug, title, original_url, click_count")
     .eq("user_id", session.id)
     .order("click_count", { ascending: false });
 

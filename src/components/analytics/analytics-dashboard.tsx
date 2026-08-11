@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/sidebar";
+import { CopyButton } from "@/components/shared/copy-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalytics } from "@/hooks/use-links";
+import { getShortUrl } from "@/lib/slug";
 import type { AnalyticsPeriod } from "@/types";
 
 function Stat({ label, value }: { label: string; value: number }) {
@@ -23,9 +25,9 @@ export function AnalyticsContent() {
   return (
     <>
       <DashboardHeader title="Analytics" description="Overview of your link performance">
-        <div className="w-full overflow-x-auto md:w-auto">
+        <div className="w-full md:w-auto">
           <Tabs value={period} onValueChange={(v) => setPeriod(v as AnalyticsPeriod)}>
-            <TabsList className="w-full min-w-max sm:w-auto">
+            <TabsList variant="line" className="w-full min-w-max sm:w-auto">
               <TabsTrigger value="daily">Daily</TabsTrigger>
               <TabsTrigger value="weekly">Weekly</TabsTrigger>
               <TabsTrigger value="monthly">Monthly</TabsTrigger>
@@ -58,32 +60,42 @@ export function AnalyticsContent() {
                         id: string;
                         slug: string;
                         title: string | null;
+                        original_url?: string;
                         click_count: number;
                       },
                       i: number
-                    ) => (
+                    ) => {
+                      const shortUrl = getShortUrl(link.slug);
+
+                      return (
                       <div
                         key={link.id}
-                        className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+                        className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
                       >
-                        <div className="flex min-w-0 items-center gap-4">
-                          <span className="w-5 text-sm text-muted-foreground">
+                        <div className="flex min-w-0 items-start gap-4">
+                          <span className="w-5 shrink-0 pt-0.5 text-sm text-muted-foreground">
                             {i + 1}
                           </span>
                           <div className="min-w-0">
-                            <p className="truncate text-base font-medium">
-                              {link.title || link.slug}
-                            </p>
-                            <p className="truncate text-sm text-muted-foreground">
-                              /{link.slug}
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="break-all text-sm font-medium sm:text-base">
+                                {shortUrl}
+                              </p>
+                              <CopyButton value={shortUrl} />
+                            </div>
+                            {link.original_url && (
+                              <p className="mt-1 break-all text-sm text-muted-foreground">
+                                {link.original_url}
+                              </p>
+                            )}
                           </div>
                         </div>
-                        <span className="shrink-0 text-base font-semibold">
-                          {link.click_count} clicks
+                        <span className="shrink-0 text-base font-semibold tabular-nums">
+                          {link.click_count.toLocaleString()} clicks
                         </span>
                       </div>
-                    )
+                    );
+                    }
                   )}
                 </div>
               ) : (
