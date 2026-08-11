@@ -2,43 +2,11 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { getDatabaseClient } from "@/lib/supabase/database";
 import {
-  aggregateByField,
-  buildTimeSeries,
-  countUniqueVisitors,
+  countPeriodClicksFromDb,
+  countUniqueVisitorsFromDb,
   getDateRangeFilter,
 } from "@/lib/analytics";
 import { getDemoLinks } from "@/lib/demo-store";
-import type { ClickEvent } from "@/types/database";
-
-const EVENTS_PAGE_SIZE = 1000;
-
-async function fetchAllClickEvents(
-  supabase: ReturnType<typeof getDatabaseClient>,
-  linkIds: string[],
-  since: string
-) {
-  const allEvents: ClickEvent[] = [];
-  let from = 0;
-
-  while (true) {
-    const { data, error } = await supabase
-      .from("click_events")
-      .select("*")
-      .in("link_id", linkIds)
-      .gte("created_at", since)
-      .order("created_at", { ascending: true })
-      .range(from, from + EVENTS_PAGE_SIZE - 1);
-
-    if (error) throw error;
-    if (!data?.length) break;
-
-    allEvents.push(...data);
-    if (data.length < EVENTS_PAGE_SIZE) break;
-    from += EVENTS_PAGE_SIZE;
-  }
-
-  return allEvents;
-}
 
 export async function GET(request: Request) {
   const session = await getSessionUser();
@@ -119,29 +87,30 @@ export async function GET(request: Request) {
     });
   }
 
-  let allEvents: ClickEvent[] = [];
-
   try {
-    allEvents = await fetchAllClickEvents(supabase, linkIds, since);
+    const [totalClicks, uniqueVisitors] = await Promise.all([
+      countPeriodClicksFromDb(supabase, linkIds, since),
+      countUniqueVisitorsFromDb(supabase, linkIds, since),
+    ]);
+
+    return NextResponse.json({
+      totalClicks,
+      allTimeClicks,
+      uniqueVisitors,
+      timeSeries: [],
+      countries: [],
+      cities: [],
+      devices: [],
+      browsers: [],
+      operatingSystems: [],
+      referrers: [],
+      topLinks,
+    });
   } catch (error) {
-    console.error("Analytics events fetch error:", error);
+    console.error("Analytics fetch error:", error);
     return NextResponse.json(
       { error: "Failed to load analytics" },
       { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    totalClicks: allEvents.length,
-    allTimeClicks,
-    uniqueVisitors: countUniqueVisitors(allEvents),
-    timeSeries: buildTimeSeries(allEvents, period),
-    countries: aggregateByField(allEvents, "country"),
-    cities: aggregateByField(allEvents, "city"),
-    devices: aggregateByField(allEvents, "device"),
-    browsers: aggregateByField(allEvents, "browser"),
-    operatingSystems: aggregateByField(allEvents, "os"),
-    referrers: aggregateByField(allEvents, "referrer"),
-    topLinks,
-  });
 }

@@ -167,7 +167,7 @@ export interface Database {
         Returns: undefined;
       };
       get_unique_visitor_count: {
-        Args: { link_uuids: string[] };
+        Args: { link_uuids: string[]; since_ts?: string | null };
         Returns: number;
       };
     };

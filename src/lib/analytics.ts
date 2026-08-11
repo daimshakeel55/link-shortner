@@ -101,13 +101,14 @@ const VISITOR_PAGE_SIZE = 1000;
 
 export async function countUniqueVisitorsFromDb(
   supabase: SupabaseClient<Database>,
-  linkIds: string[]
+  linkIds: string[],
+  since?: string
 ): Promise<number> {
   if (linkIds.length === 0) return 0;
 
   const { data: rpcCount, error: rpcError } = await supabase.rpc(
     "get_unique_visitor_count",
-    { link_uuids: linkIds }
+    { link_uuids: linkIds, since_ts: since ?? null }
   );
 
   if (!rpcError && rpcCount != null) {
@@ -118,12 +119,17 @@ export async function countUniqueVisitorsFromDb(
   let from = 0;
 
   while (true) {
-    const { data, error } = await supabase
+    let query = supabase
       .from("click_events")
       .select("visitor_id")
       .in("link_id", linkIds)
-      .not("visitor_id", "is", null)
-      .range(from, from + VISITOR_PAGE_SIZE - 1);
+      .not("visitor_id", "is", null);
+
+    if (since) {
+      query = query.gte("created_at", since);
+    }
+
+    const { data, error } = await query.range(from, from + VISITOR_PAGE_SIZE - 1);
 
     if (error) throw error;
     if (!data?.length) break;
@@ -137,6 +143,23 @@ export async function countUniqueVisitorsFromDb(
   }
 
   return visitors.size;
+}
+
+export async function countPeriodClicksFromDb(
+  supabase: SupabaseClient<Database>,
+  linkIds: string[],
+  since: string
+): Promise<number> {
+  if (linkIds.length === 0) return 0;
+
+  const { count, error } = await supabase
+    .from("click_events")
+    .select("*", { count: "exact", head: true })
+    .in("link_id", linkIds)
+    .gte("created_at", since);
+
+  if (error) throw error;
+  return count ?? 0;
 }
 
 export function getDateRangeFilter(period: "daily" | "weekly" | "monthly"): Date {

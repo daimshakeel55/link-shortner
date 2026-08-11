@@ -142,5 +142,6 @@ export function useAnalytics(period: string, linkId?: string) {
       if (!res.ok) throw new Error("Failed to fetch analytics");
       return res.json();
     },
+    staleTime: 0,
   });
 }

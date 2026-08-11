@@ -1,4 +1,7 @@
-CREATE OR REPLACE FUNCTION public.get_unique_visitor_count(link_uuids UUID[])
+CREATE OR REPLACE FUNCTION public.get_unique_visitor_count(
+  link_uuids UUID[],
+  since_ts TIMESTAMPTZ DEFAULT NULL
+)
 RETURNS BIGINT
 LANGUAGE sql
 STABLE
@@ -8,5 +11,6 @@ AS $$
   SELECT COUNT(DISTINCT visitor_id)::BIGINT
   FROM click_events
   WHERE link_id = ANY(link_uuids)
-    AND visitor_id IS NOT NULL;
+    AND visitor_id IS NOT NULL
+    AND (since_ts IS NULL OR created_at >= since_ts);
 $$;
