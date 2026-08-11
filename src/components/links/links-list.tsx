@@ -32,7 +32,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -52,6 +51,12 @@ import {
 } from "@/components/ui/dialog";
 import { useLinks, useDeleteLink } from "@/hooks/use-links";
 import { getShortUrl } from "@/lib/slug";
+
+const STATUS_LABELS: Record<string, string> = {
+  all: "All",
+  active: "Active",
+  inactive: "Inactive",
+};
 
 export function LinksPageContent() {
   const router = useRouter();
@@ -113,7 +118,7 @@ export function LinksPageContent() {
             }}
           >
             <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Status" />
+              <span className="flex flex-1 text-left">{STATUS_LABELS[status]}</span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
