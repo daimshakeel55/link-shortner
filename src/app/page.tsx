@@ -1,5 +1,5 @@
+import { redirect } from "next/navigation";
 import { Navbar } from "@/components/landing/navbar";
-import { HomeSignedInRedirect } from "@/components/auth/home-signed-in-redirect";
 import { AuthHashErrorHandler } from "@/components/auth/auth-hash-error-handler";
 import { Hero } from "@/components/landing/hero";
 import { Features } from "@/components/landing/features";
@@ -10,12 +10,19 @@ import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
 import { Footer } from "@/components/landing/footer";
 import { JsonLd } from "@/components/shared/json-ld";
+import { getSessionUser } from "@/lib/auth/session";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const session = await getSessionUser();
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="mesh-bg min-h-screen">
       <AuthHashErrorHandler />
-      <HomeSignedInRedirect />
       <JsonLd />
       <Navbar />
       <Hero />

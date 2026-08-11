@@ -1,10 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { LinkButton } from "@/components/shared/link-button";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
 
-function GuestNav({ variant }: { variant: "desktop" | "mobile" }) {
+export function LandingAuthNav({ variant }: { variant: "desktop" | "mobile" }) {
   const isMobile = variant === "mobile";
 
   if (isMobile) {
@@ -28,56 +24,4 @@ function GuestNav({ variant }: { variant: "desktop" | "mobile" }) {
       </LinkButton>
     </>
   );
-}
-
-function SignedInNav({ variant }: { variant: "desktop" | "mobile" }) {
-  const isMobile = variant === "mobile";
-
-  if (isMobile) {
-    return (
-      <div className="flex flex-col gap-2 pt-2">
-        <LinkButton href="/dashboard">Dashboard</LinkButton>
-      </div>
-    );
-  }
-
-  return (
-    <LinkButton href="/dashboard" size="sm">
-      Dashboard
-    </LinkButton>
-  );
-}
-
-export function LandingAuthNav({ variant }: { variant: "desktop" | "mobile" }) {
-  const configured = isSupabaseConfigured();
-  const [isLoaded, setIsLoaded] = useState(!configured);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-
-  useEffect(() => {
-    if (!configured) return;
-
-    void (async () => {
-      try {
-        const response = await fetch("/api/auth/session", {
-          cache: "no-store",
-          credentials: "include",
-        });
-        setIsSignedIn(response.ok);
-      } catch {
-        setIsSignedIn(false);
-      } finally {
-        setIsLoaded(true);
-      }
-    })();
-  }, [configured]);
-
-  if (!configured || !isLoaded) {
-    return <GuestNav variant={variant} />;
-  }
-
-  if (isSignedIn) {
-    return <SignedInNav variant={variant} />;
-  }
-
-  return <GuestNav variant={variant} />;
 }
