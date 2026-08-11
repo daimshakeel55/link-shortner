@@ -98,13 +98,9 @@ export function LinkPreview({ destinationUrl }: LinkPreviewProps) {
         <Logo />
       </header>
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
-        <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg md:p-8">
-          <p className="text-center text-sm text-muted-foreground">
-            Here&apos;s a preview of your destination
-          </p>
-
-          <div className="mt-6 text-center">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 px-6 py-8">
+        <div className="w-full rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg md:p-8">
+          <div className="text-center">
             <p className="text-sm font-medium text-muted-foreground">Destination:</p>
             <p className="mt-2 break-all text-xl font-semibold text-primary md:text-2xl">
               {displayUrl}
