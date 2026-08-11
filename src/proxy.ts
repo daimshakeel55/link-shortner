@@ -56,16 +56,6 @@ export default async function proxy(request: NextRequest) {
     const { supabaseResponse, user } = await updateSession(request);
     const isAuthenticated = Boolean(user) || hasDemoSession(request);
 
-    if (pathname === "/" && isAuthenticated) {
-      const redirectResponse = NextResponse.redirect(
-        new URL("/dashboard", request.url)
-      );
-      supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-        redirectResponse.cookies.set(name, value);
-      });
-      return redirectResponse;
-    }
-
     if (matchesPrefix(pathname, protectedPrefixes) && !isAuthenticated) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
