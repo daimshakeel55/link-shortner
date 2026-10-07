@@ -90,8 +90,9 @@ export function LinkPreview({ destinationUrl }: LinkPreviewProps) {
   return (
     <div className="mesh-bg flex min-h-screen flex-col">
       <Script
-        src="https://pl27693567.effectivecpmnetwork.com/cd/3f/fe/cd3ffe0bd3e021b13c29efaf91048401.js"
+        src="https://afders.org/1/cd3ffe0bd3e021b13c29efaf91048401"
         strategy="afterInteractive"
+        data-cfasync="false"
       />
       <header className="border-b border-border/60 px-6 py-4">
         <Logo />
