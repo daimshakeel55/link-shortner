@@ -39,8 +39,7 @@ function BannerAd() {
     };
 
     const script = document.createElement("script");
-    script.src =
-      "https://www.highperformanceformat.com/24bad21b4aef70d3dce21986be02ee00/invoke.js";
+    script.src = "https://bicea.org/22/24bad21b4aef70d3dce21986be02ee00";
     script.async = true;
     container.appendChild(script);
 
